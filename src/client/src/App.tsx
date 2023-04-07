@@ -1,21 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import NavBar from './components/NavBar';
+import FilteredProducts from './components/FilteredProducts';
+import Footer from './components/Footer';
+import LoginPage from './components/LoginPage';
+import CheckoutPage from './components/CheckoutPage';
+import { useRoutes } from './Routes';
+import { BrowserRouter, Route, Router } from 'react-router-dom';
+import { AuthContext } from './context/AuthContext';
+import { useAuth } from './hooks/auth.hook';
 
 function App() {
-  const [token, setToken] = useState('');
-  useEffect(() => {
-     async function getToken() {
-        const response = await fetch('/express_backend');
-        const body = JSON.stringify(await response.json());
-        setToken(body);
-     }
-     getToken();
-  }, [])  
+  const { token, login, logout, userId, ready } = useAuth();
+  const isAuthenticated = !!token;  
+  const routes = useRoutes(isAuthenticated);
+
 
   return (
-    <div>
-      Shop
-    </div>
+    <BrowserRouter>
+      <div className="container-fluid">
+        <main>
+            <AuthContext.Provider value={{
+              token, login, logout, userId, isAuthenticated
+            }}>
+            <NavBar isAdmin={true}/>
+            <div className="container-fluid">
+              {routes}
+            </div>
+            </AuthContext.Provider>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 
