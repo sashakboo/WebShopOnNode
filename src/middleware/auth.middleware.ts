@@ -14,8 +14,8 @@ export default function Auth (req: Request<{ userId: string}>, res: Response, ne
       return; 
     }
 
-    const decoded = jwt.verify(token, config.get('jwtSecret'));
-    req.params.userId = decoded as string;
+    const decoded: any = jwt.verify(token, config.get('jwtSecret'));
+    req.params.userId = decoded.userId as string;
     console.log(req.params);
     next();
   } catch (e) {

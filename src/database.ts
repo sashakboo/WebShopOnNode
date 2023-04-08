@@ -65,11 +65,46 @@ export async function GetProducts(categoryId: number | null, isActive: boolean):
     return Promise.resolve(products);
 }
 
-export async function AddToBasket(productId: number, userId: number) {
+export async function GetBasketProducts(userId: number): Promise<Array<IProduct>> {
+    const commandText = 'select p.id, p.title, c.id as categoryId, c.title as categoryTitle, p.price, convert_from(p.icon, \'UTF8\') as icon ' + 
+      'from public.basket b ' + 
+      'inner join public.products p on p.id = b.product '+ 
+      'inner join public.productscategory c on p.category = c.id ' + 
+      'where b.customer = $1::int';
+    const params = [ userId ];
+    const results = await executeCommand(commandText, params);
+    const products = results.rows.map(r => {
+        const product: IProduct = {
+            id: r["id"],
+            category : {
+                id: r["categoryId"],
+                title: r["categoryTitle"]
+            },
+            title: r["title"],
+            price: r["price"],
+            tag: '',
+            icon: r['icon']
+        }
+        return product;
+    });
+    return Promise.resolve(products);
+}
+
+export async function GetBasketCount(userId: number): Promise<number> {
+    const commandText = 'select count(id) as count from public.basket where customer = $1::int';
+    const params = [ userId ];
+    const results = await executeCommand(commandText, params);
+    if (results.rowCount !== 1)
+      return Promise.resolve(0);
+
+    const count = results.rows[0]['count'] as number
+    return Promise.resolve(count);
+}
+
+export async function AddToBasket(productId: number, userId: number): Promise<void> {
     const commandText = 'insert into public.basket (product, customer) values ($1::int, $2::int)';
     const params = [ productId, userId ];
-    const result = await executeCommand(commandText, params);
-    console.log(result);
+    await executeCommand(commandText, params);
 }
 
 export function TestDBConnect(connectionString: string){

@@ -1,31 +1,55 @@
 import { Router } from "express";
-import { GetProducts } from "../database.js";
+import { AddToBasket, GetBasketCount, GetBasketProducts, GetProducts } from "../database.js";
 import { Request, Response } from 'express';
 import Auth from "../middleware/auth.middleware.js";
 
-const productsRouter = Router();
+const basketRouter = Router();
 
-productsRouter.get('/', Auth, async (req: Request, res: Response) => {
+basketRouter.get('/', Auth, async(req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    if (Number.isNaN(userId))
+    {
+      res.status(400);
+    }    
+    const filteredProducts = await GetBasketProducts(userId);
+    res.json(filteredProducts);          
+  } catch (e) {
+    res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
+  }
+})
+
+basketRouter.get('/count', Auth, async(req: Request, res: Response) => {
+  try {   
+    const userId = parseInt(req.params.userId);
+    if (Number.isNaN(userId))
+    {
+      res.status(400);
+    }   
+    const result = await GetBasketCount(userId);
+    res.json(result);          
+  } catch (e) {
+    res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
+  }
+})
+
+basketRouter.post('/add/:id', Auth, async (req: Request, res: Response) => {
     try {        
-      const filteredProducts = await GetProducts(null, true);
-      res.json(filteredProducts);          
-    } catch (e) {
-      res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
-    }
-  });
-
-productsRouter.get('/:catId', async (req: Request, res:Response) => {
-    try {      
-      const catId: number = parseInt(req.params.catId);
-      if (Number.isNaN(catId))
+      const id: number = parseInt(req.params.id);
+      if (Number.isNaN(id))
       {
         res.status(400);
       }
-      const filteredProducts = await GetProducts(catId, true);
-      res.json(filteredProducts);          
+      const userId = parseInt(req.params.userId);
+      if (Number.isNaN(userId))
+      {
+        res.status(400);
+      }
+      await AddToBasket(id, userId);
+      res.status(200).json('Товар добален в корзину');          
     } catch (e) {
       res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
     }
   });
 
-export default productsRouter;
+export default basketRouter;

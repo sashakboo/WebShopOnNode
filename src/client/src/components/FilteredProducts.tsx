@@ -6,6 +6,7 @@ import Products from "./Products";
 import { useParams } from "react-router-dom";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
+import { NotifyContext } from "../context/NotifyContext";
 
 export default function FilteredProducts() {
     const [ productList, setProducts ] = useState<Array<IProduct>>([]);
@@ -27,11 +28,21 @@ export default function FilteredProducts() {
         fetchProducts();
     }, [categoryId]);
 
+    const { changeBasketCount } = useContext(NotifyContext);
+
+    const addToBasket = async (product: IProduct) => {
+        try {
+            const apiUrl = `/api/basket/add/${product.id}`;
+            const response = await request(apiUrl, 'POST', null, { Authorization: `Bearer ${auth.token}` });  
+            changeBasketCount(1); 
+        } catch (e) { }
+    }
+
 
     return (
         <div>
             <FilterPanel />
-            <Products products={[...productList]} />
+            <Products products={[...productList]} addToBasket={addToBasket} />
             <Pagination/>
         </div>
     )

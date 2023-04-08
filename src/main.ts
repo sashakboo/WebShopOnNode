@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import { TestDBConnect } from './database.js';
 import productsRouter from './routes/products.routes.js';
 import authRouter from './routes/auth.routes.js';
+import basketRouter from './routes/basket.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -20,6 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/api/products', productsRouter)
 app.use('/api/auth', authRouter);
+app.use('/api/basket', basketRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.use('/', express.static(path.join(__dirname, 'client')));
