@@ -1,4 +1,5 @@
 {
     "port": 5000,
-    "DATABASE_URL": "postgresql://mveu:k-XCXn-XUY1_yyg7SSn_8A@university-cluster-7388.8nj.cockroachlabs.cloud:26257/mveushop?sslmode=verify-full"
+    "DATABASE_URL": "postgresql://mveu:k-XCXn-XUY1_yyg7SSn_8A@university-cluster-7388.8nj.cockroachlabs.cloud:26257/mveushop?sslmode=verify-full",
+    "jwtSecret": "1"
 }

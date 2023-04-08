@@ -28,7 +28,7 @@ export default function ProductCard(props: IProduct) {
                 <Link to={`/filter/cat/${props.category.id}`} className="text-reset ">
                     <p>{props.category.title}</p>
                 </Link>
-                <h6 className="mb-3 price">{props.price}$</h6>
+                <h6 className="mb-3 price">{props.price} р.</h6>
             </div>
         </div>
     )

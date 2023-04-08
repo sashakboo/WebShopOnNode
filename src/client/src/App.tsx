@@ -1,20 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
 import NavBar from './components/NavBar';
-import FilteredProducts from './components/FilteredProducts';
 import Footer from './components/Footer';
-import LoginPage from './components/LoginPage';
-import CheckoutPage from './components/CheckoutPage';
 import { useRoutes } from './Routes';
 import { BrowserRouter, Route, Router } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import { useAuth } from './hooks/auth.hook';
 
+import './App.css';
+
 function App() {
   const { token, login, logout, userId, ready } = useAuth();
   const isAuthenticated = !!token;  
   const routes = useRoutes(isAuthenticated);
-
 
   return (
     <BrowserRouter>
@@ -23,7 +19,7 @@ function App() {
             <AuthContext.Provider value={{
               token, login, logout, userId, isAuthenticated
             }}>
-            <NavBar isAdmin={true}/>
+            <NavBar />
             <div className="container-fluid">
               {routes}
             </div>

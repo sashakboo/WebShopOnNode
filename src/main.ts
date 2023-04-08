@@ -2,8 +2,10 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import config from 'config';
+import bodyParser from 'body-parser';
 import { TestDBConnect } from './database.js';
-import productsRouter from './routes/products.js';
+import productsRouter from './routes/products.routes.js';
+import authRouter from './routes/auth.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -13,11 +15,11 @@ const DATABASE_URL = config.get<string>('DATABASE_URL') || '';
 
 const app = express();
 
-app.get('/express_backend', (req, res) => {
-  res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' });
-});
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/api/products', productsRouter)
+app.use('/api/auth', authRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.use('/', express.static(path.join(__dirname, 'client')));

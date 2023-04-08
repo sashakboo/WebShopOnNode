@@ -1,17 +1,33 @@
-import { Link, NavLink } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
 import brand from '../resources/brand.jpg'
+import basket from '../resources/basket.png'
+import { useHttp } from '../hooks/http.hook';
 
-interface INavBarProps {
-    isAdmin: boolean
-}
+export default function NavBar() {
+    const { request } = useHttp();
+    const { token, userId, logout } = useContext(AuthContext);
+    const isAuthenticated = !!token;
+    
+    const [ isAdmin, setIsAdmin] = useState(false);
+    const fetchUserRole = async () => {
+        try {
+            if (!isAuthenticated || Number.isNaN(userId))
+              return;
 
-export default function NavBar(props: INavBarProps) {
-    const isAdmin = props.isAdmin;
-    const adminPage = isAdmin 
-        ? (<li className="nav-item">
-            <a className="nav-link" href="/admin">ЛК</a>
-        </li>)
-        : null;
+            const apiUrl = `/api/auth/role/${userId as number}`;
+            const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${token}` });
+            const data = response as any;
+            setIsAdmin(data.role === 'admin');    
+        } catch (e) { }
+      }
+
+    useEffect(() => {
+        fetchUserRole();
+    }, [token]);
 
     return (
         <div className="fixed-top">
@@ -39,7 +55,13 @@ export default function NavBar(props: INavBarProps) {
                     <li className="nav-item">
                         <a className="nav-link" href="/about">О магазине</a>
                     </li>
-                    {adminPage}                    
+                    {
+                    isAdmin 
+                        ? (<li className="nav-item">
+                            <a className="nav-link" href="/admin">ЛК</a>
+                        </li>)
+                        : null
+                    }                    
                     </ul>
                     {/* Left links */}      
                 
@@ -47,12 +69,17 @@ export default function NavBar(props: INavBarProps) {
                     <div className="d-flex align-items-center">
                         {/* Icon */}
                         <a className="nav-link me-3" href="#">
-                        <i className="fas fa-shopping-cart"></i>
+                        <img className="fas fa-shopping-cart" src={basket} />
                         <span className="badge rounded-pill badge-notification bg-danger">1</span>
                         </a>
-                        <Link to="/auth" className="border rounded px-2 nav-link">
-                            <i className="fab fa-github me-2"></i>Войти
-                        </Link>
+                        {isAuthenticated
+                            ? (<Link to="/auth" className="border rounded px-2 nav-link" onClick={logout}>
+                                <i className="fab me-2"></i>Выйти
+                            </Link>)
+                            : (<Link to="/auth" className="border rounded px-2 nav-link">
+                                    <i className="fab me-2"></i>Войти
+                            </Link>)}
+                        
                     </div>
                     {/* Right elements */}
                 

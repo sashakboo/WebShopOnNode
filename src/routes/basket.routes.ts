@@ -1,28 +1,27 @@
 import { Router } from "express";
-import { IProduct } from "../models.js";
 import { GetProducts } from "../database.js";
+import { Request, Response } from 'express';
+import Auth from "../middleware/auth.middleware.js";
 
 const productsRouter = Router();
 
-productsRouter.get('/', async (req, res) => {
-    console.log('get products');
+productsRouter.get('/', Auth, async (req: Request, res: Response) => {
     try {        
-      const filteredProducts = await GetProducts(null);
+      const filteredProducts = await GetProducts(null, true);
       res.json(filteredProducts);          
     } catch (e) {
       res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
     }
   });
 
-productsRouter.get('/:catId', async (req, res) => {
-    console.log('get products', req.params.catId);
+productsRouter.get('/:catId', async (req: Request, res:Response) => {
     try {      
       const catId: number = parseInt(req.params.catId);
       if (Number.isNaN(catId))
       {
         res.status(400);
       }
-      const filteredProducts = await GetProducts(catId);
+      const filteredProducts = await GetProducts(catId, true);
       res.json(filteredProducts);          
     } catch (e) {
       res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });

@@ -11,3 +11,9 @@ export interface IProduct {
     price: number,
     tag: string
 }
+
+export interface IUser {
+    id: number,
+    email: string,
+    password: string
+}
