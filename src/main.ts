@@ -15,9 +15,9 @@ const __dirname = path.dirname(__filename);
 const PORT = config.get<number>('port') || 5000;
 
 const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/api/products', productsRouter)
 app.use('/api/auth', authRouter);

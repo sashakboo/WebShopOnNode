@@ -20,12 +20,12 @@ export interface IEditableTableProps {
   values: Array<Array<string | number>>
   sourceObjs: Array<any>,
   canDisable: boolean,
-  updateItemCallback: (sourceObj: object, form: Map<string, string | number>) => void
+  updateItemCallback: (sourceObj: object, form: Map<string, any>) => void
 }
 
 export function EditableTable(props: IEditableTableProps) {
   const [ editableRow, setEditableRow ] = useState<null | number>(null);
-  const [ form, setForm ] = useState<Map<string, string | number>>(new Map());
+  const [ form, setForm ] = useState<Map<string, any>>(new Map());
   const changeHandler = (event: React.FormEvent<HTMLSelectElement | HTMLInputElement>) => {
     if (event.currentTarget == null){
       return;
@@ -35,15 +35,24 @@ export function EditableTable(props: IEditableTableProps) {
     setForm((previousForm) => previousForm.set(key, value));
   }
 
+  const fileChangedHandler = (event: React.FormEvent<HTMLInputElement>) => {
+    if (event.currentTarget == null){
+      return;
+    }
+    const key = event.currentTarget.name;
+    const value = event.currentTarget.files?.item(0);
+    setForm((previousForm) => previousForm.set(key, value));
+  }
+
   const getValueElement = (rowIndex: number, valueIndex: number) => {
+    const inputType = props.inputTypes[valueIndex];
     if (rowIndex === editableRow) {
-      const inputType = props.inputTypes[valueIndex];
       const className = 'form-control form-control-sm';
       const propertyId = props.columnsIds[valueIndex];
       if (inputType === InputTypes.image){
         return (
           <td key={`${rowIndex}-${valueIndex}`}>
-            <input className={className} name={propertyId} onChange={changeHandler} type="file" accept="image/png, image/gif, image/jpeg" />
+            <input className={className} name={propertyId} onChange={fileChangedHandler} type="file" accept="image/png, image/gif, image/jpeg" />
           </td>
         )
       }
@@ -71,6 +80,14 @@ export function EditableTable(props: IEditableTableProps) {
       return (
         <td key={`${rowIndex}-${valueIndex}`}>
           <input className={className} name={propertyId} onChange={changeHandler} disabled={disabled} type={inputTypeHtml}  defaultValue={defaultValue} />
+        </td>
+      )
+    }
+
+    if (inputType === InputTypes.image){
+      return (
+        <td className="w-25" key={`${rowIndex}-${valueIndex}`}>
+          <img className="img-fluid img-thumbnail" src={`data:image/png;base64,${props.values[rowIndex][valueIndex].toString()}`}/>
         </td>
       )
     }

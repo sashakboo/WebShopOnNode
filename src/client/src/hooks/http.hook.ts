@@ -6,10 +6,10 @@ export const useHttp = () => {
   const [error, setError] = useState<string | null>(null);
   const auth = useContext(AuthContext);
 
-  const request = useCallback( async (url: string, method: string = 'GET', body: string | null = null, headers: { [id: string] : string; } = {}) => {
+  const request = useCallback( async (url: string, method: string = 'GET', body: string | FormData | null  = null, headers: { [id: string] : string; } = {}) => {
     setLoading(true);
     try {
-      if (body) {
+      if (body != null && typeof body === 'string') {
         headers['Content-type'] = 'application/json';
       }
       const response = await fetch(url, {

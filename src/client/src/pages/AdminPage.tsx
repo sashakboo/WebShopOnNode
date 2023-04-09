@@ -125,11 +125,11 @@ export default function AdminPage() {
       inputTypes: [ null, InputTypes.select, InputTypes.text, InputTypes.number, InputTypes.image ],
       selectItems: [ null, categorySelectItems, null, null, null ],
       values: products.map((p) => {
-        return [ p.id, p.category.title, p.title, p.price, '' ]
+        return [ p.id, p.category.title, p.title, p.price, p.icon ]
       }),
       sourceObjs: [ ...products ],
       canDisable: false,
-      updateItemCallback: (sourceObj, form) => {
+      updateItemCallback: async (sourceObj, form) => {
         const product = sourceObj as IProduct;
         const updatedProduct: IUpdatedProduct = {
           id: product.id,
@@ -138,14 +138,27 @@ export default function AdminPage() {
           price: form.get('price') as number ?? product.price
         }
 
-        updateProduct(updatedProduct);
+        const icon = form.get('icon') as File;
+        await updateProduct(updatedProduct);
+        if (icon != null) {
+          await updateIcon(product.id, icon);
+        }
       }
+    }
+
+    const updateIcon = async(productId: number, file: File) => {
+      try {
+        const apiUrl = `/api/products/updateicon/${productId}`;
+        const formData = new FormData();
+        formData.append('icon', file);
+        await request(apiUrl, 'POST', formData, { Authorization: `Bearer ${auth.token}` });
+      } catch (error) { }
     }
   
     const updateProduct = async (product: IUpdatedProduct) => {
       try {
         const apiUrl = '/api/products/update';
-        const response = await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
+        await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
       } catch (error) { }
     }
   }
