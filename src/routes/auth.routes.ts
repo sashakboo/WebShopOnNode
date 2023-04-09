@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import config from 'config';
 import { check, validationResult } from 'express-validator';
 import { Request, Response } from 'express';
-import { CreateUser, GetUser, GetUserRole } from '../services/users.js';
+import { CreateUser, GetUserByEmail, GetUserRole } from '../services/users.js';
 import Auth from '../middleware/auth.middleware.js';
 
 interface ILoginBody {
@@ -37,7 +37,7 @@ authRouter.post(
         }      
   
         const { email, password } = req.body;  
-        const candidate = await GetUser(email);
+        const candidate = await GetUserByEmail(email);
   
         if (candidate) {
           return res.status(400).json({ message: 'Такой пользователь уже существует' });
@@ -82,7 +82,7 @@ authRouter.post(
       }
 
       const { email, password } = req.body;
-      const user = await GetUser(email);
+      const user = await GetUserByEmail(email);
 
       if (!user) {
         return res.status(400).json({ message: 'Пользователь не найден' });

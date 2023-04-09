@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { EditableTable, IEditableTableProps, InputTypes } from "../components/EditableTable";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
-import { ICategory, IProduct, IUpdatedProduct, IUser } from "../types/models";
+import { ICategory, ICreatedProduct, IProduct, IUpdatedProduct, IUser } from "../types/models";
 
 interface ITab {
   id: string, 
@@ -47,8 +47,9 @@ export default function AdminPage() {
     selectItems: [],
     values: [],
     sourceObjs: [],
-    canDisable: false,
-    updateItemCallback: (sourceObj, form) => { }
+    canAddNew: false,
+    updateItem: (sourceObj, form) => { },
+    addNewItem: () => { }
   };
 
   useEffect(() => {
@@ -68,7 +69,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     async function getProducts() {
-      const apiUrl = '/api/products';
+      const apiUrl = '/api/products/admin';
       const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${auth.token}` });
       const loadedProducts = response as Array<IProduct>;
       setProducts([...loadedProducts]);
@@ -96,70 +97,121 @@ export default function AdminPage() {
         return [ u.id, u.email, u.role, '' ]
       }),
       sourceObjs: [ ...users ],
-      canDisable: false,
-      updateItemCallback: (sourceObj, form) => {
+      canAddNew: false,
+      updateItem: async (sourceObj, form) => {
         const user = sourceObj as IUser;
         const newUser: IUser = { 
           ...user, 
           password: (form.get('password') as string ?? user.password), 
           role: (form.get('role') as string ?? user.role) 
         };
-        updateUser(newUser)
-        console.log('updated', newUser)
-      }
+        const result = await updateUser(newUser);
+        setUsers(users.map(u => {
+          if (u.id === result?.id)
+            return result;
+
+          return u;
+        }));
+      },
+      addNewItem: () => { }
     }
   
     const updateUser = async (user: IUser) => {
       try {
         const apiUrl = '/api/users/update';
         const response = await request(apiUrl, 'POST', JSON.stringify({ id: user.id, password: user.password, role: user.role }), { Authorization: `Bearer ${auth.token}` });
+        return response as IUser;
       } catch (e) { }
     }
   }
 
   if (activeTab.id === 'products') {
-    const categorySelectItems = categories.map(c => ({ id: c.id, title: c.title }));
-    tableProps = {
-      columnsIds: [ 'id', 'category', 'title', 'price', 'icon' ],
-      columnsTitle: [ 'ID', 'Категория', 'Имя', 'Цена', 'Фото' ],
-      inputTypes: [ null, InputTypes.select, InputTypes.text, InputTypes.number, InputTypes.image ],
-      selectItems: [ null, categorySelectItems, null, null, null ],
-      values: products.map((p) => {
-        return [ p.id, p.category.title, p.title, p.price, p.icon ]
-      }),
-      sourceObjs: [ ...products ],
-      canDisable: false,
-      updateItemCallback: async (sourceObj, form) => {
-        const product = sourceObj as IProduct;
-        const updatedProduct: IUpdatedProduct = {
-          id: product.id,
-          categoryId: form.get('category') as number ?? product.category.id,
-          title: form.get('title') as string ?? product.title,
-          price: form.get('price') as number ?? product.price
-        }
-
-        const icon = form.get('icon') as File;
-        await updateProduct(updatedProduct);
-        if (icon != null) {
-          await updateIcon(product.id, icon);
-        }
-      }
-    }
-
-    const updateIcon = async(productId: number, file: File) => {
+    const createIcon = async(file: File) => {
       try {
-        const apiUrl = `/api/products/updateicon/${productId}`;
+        const apiUrl = `/api/files/createicon`;
         const formData = new FormData();
         formData.append('icon', file);
-        await request(apiUrl, 'POST', formData, { Authorization: `Bearer ${auth.token}` });
+        const response = await request(apiUrl, 'POST', formData, { Authorization: `Bearer ${auth.token}` });
+        return response.filePath as string;
       } catch (error) { }
     }
   
     const updateProduct = async (product: IUpdatedProduct) => {
       try {
         const apiUrl = '/api/products/update';
-        await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
+        const response = await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
+        return response as IProduct;
       } catch (error) { }
+    }
+
+    const createProduct = async (product: ICreatedProduct) => {
+      try {
+        const apiUrl = '/api/products/create';
+        const response = await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
+        return response as IProduct;
+      } catch (error) { }
+    }
+
+    const updateProductHandler = async (sourceObj: object, form: Map<string, any>) => {
+      console.log(form)
+      const icon = form.get('icon') as File;
+      let iconPath = null;
+      if (icon != null) {
+        iconPath = await createIcon(icon);
+      }
+      const product = sourceObj as IProduct;
+      const updatedProduct: IUpdatedProduct = {
+        id: product.id,
+        categoryId: form.get('category') as number ?? product.category.id,
+        title: form.get('title') as string ?? product.title,
+        price: form.get('price') as number ?? product.price,
+        iconPath: iconPath ?? null,
+        isActive: form.get('isactive') == 1 ?? true
+      }
+      console.log(form.get('isactive'))
+      console.log(updatedProduct)
+
+      const updateResult = await updateProduct(updatedProduct);
+      setProducts(products.map(p => {
+        if (p.id === updateResult?.id)
+          return updateResult;
+
+        return p;
+      }));
+    }
+
+    const addProductHandler = async (form: Map<string, any>) => {
+      const icon = form.get('icon') as File;
+      let iconPath = null;
+      if (icon != null) {
+        iconPath = await createIcon(icon);
+      }
+
+      const newProduct: ICreatedProduct = {
+        categoryId: form.get('category') as number,
+        title: form.get('title') as string,
+        price: form.get('price') as number,
+        iconPath: iconPath ?? null,
+        isActive: form.get('isactive') == 1 ? true : false
+      }      
+      const result = await createProduct(newProduct) as IProduct;
+      setProducts([ result, ...products ]);
+    }
+
+    const categorySelectItems = categories.map(c => ({ id: c.id, title: c.title }));
+    const isActiveSelectItems = [ { id: 1, title: 'Да' }, { id: 0, title: 'Нет' } ];
+    tableProps = {
+      columnsIds: [ 'id', 'category', 'title', 'price', 'isactive', 'icon' ],
+      columnsTitle: [ 'ID', 'Категория', 'Имя', 'Цена', 'Вкл.', 'Фото'],
+      inputTypes: [ null, InputTypes.select, InputTypes.text, InputTypes.number, InputTypes.select, InputTypes.image ],
+      selectItems: [ null, categorySelectItems, null, null, isActiveSelectItems, null ],
+      values: products.map((p) => {
+        return [ p.id, p.category.title, p.title, p.price, p.isActive ? 'Да' : 'Нет', p.icon]
+      }),
+      sourceObjs: [ ...products ],
+      canAddNew: true,
+      updateItem: updateProductHandler,
+      addNewItem: addProductHandler
     }
   }
   

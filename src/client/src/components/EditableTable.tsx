@@ -19,11 +19,13 @@ export interface IEditableTableProps {
   selectItems: Array<Array<ISelectItem> | null>
   values: Array<Array<string | number>>
   sourceObjs: Array<any>,
-  canDisable: boolean,
-  updateItemCallback: (sourceObj: object, form: Map<string, any>) => void
+  canAddNew: boolean,
+  updateItem: (sourceObj: object, form: Map<string, any>) => void
+  addNewItem: (form: Map<string, any>) => void
 }
 
 export function EditableTable(props: IEditableTableProps) {
+  const newRowIndex = -1;
   const [ editableRow, setEditableRow ] = useState<null | number>(null);
   const [ form, setForm ] = useState<Map<string, any>>(new Map());
   const changeHandler = (event: React.FormEvent<HTMLSelectElement | HTMLInputElement>) => {
@@ -44,50 +46,61 @@ export function EditableTable(props: IEditableTableProps) {
     setForm((previousForm) => previousForm.set(key, value));
   }
 
+  const getInputElement = (rowIndex: number, valueIndex: number, defaultValue: string | number | null) => {
+    const inputType = props.inputTypes[valueIndex];
+    const className = 'form-control form-control-sm';
+    const propertyId = props.columnsIds[valueIndex];
+    if (inputType === InputTypes.image){
+      return (
+        <td key={`${rowIndex}-${valueIndex}`}>
+          <input className={className} name={propertyId} onChange={fileChangedHandler} type="file" accept="image/png, image/gif, image/jpeg" />
+        </td>
+      )
+    }
+
+    if (inputType === InputTypes.select) {
+      const selectItems = props.selectItems[valueIndex] ?? [];
+      let defaultSelect = newRowIndex;
+      if (rowIndex != newRowIndex){
+        const currentSelect = props.values[rowIndex][valueIndex] as string;
+        defaultSelect = selectItems.find(x => x.title === currentSelect)?.id ?? selectItems[0].id;
+      }
+
+      return (
+        <td key={`${rowIndex}-${valueIndex}`}>
+          <select className="form-control form-control-sm" name={propertyId} defaultValue={defaultSelect} onChange={changeHandler}>
+            <option disabled={true} value={-1}>-----</option>
+            {
+              selectItems.map((s, i) => {
+                return (
+                  <option value={s.id} key={`${s.id}-${i}`}>{s.title}</option>
+                )
+              })
+            }
+          </select>
+        </td>
+      )
+    }
+
+    const inputTypeHtml = inputType === InputTypes.number ? 'number' : 'text';
+    const disabled = props.inputTypes[valueIndex] == null;
+    return (
+      <td key={`${rowIndex}-${valueIndex}`}>
+        <input className={className} name={propertyId} onChange={changeHandler} disabled={disabled} type={inputTypeHtml}  defaultValue={defaultValue ?? ''} />
+      </td>
+    )
+  }
+
   const getValueElement = (rowIndex: number, valueIndex: number) => {
     const inputType = props.inputTypes[valueIndex];
     if (rowIndex === editableRow) {
-      const className = 'form-control form-control-sm';
-      const propertyId = props.columnsIds[valueIndex];
-      if (inputType === InputTypes.image){
-        return (
-          <td key={`${rowIndex}-${valueIndex}`}>
-            <input className={className} name={propertyId} onChange={fileChangedHandler} type="file" accept="image/png, image/gif, image/jpeg" />
-          </td>
-        )
-      }
-
-      if (inputType === InputTypes.select) {
-        const selectItems = props.selectItems[valueIndex] ?? [];
-        return (
-          <td key={`${rowIndex}-${valueIndex}`}>
-            <select className="form-control form-control-sm" name={propertyId} defaultValue={selectItems[0].id} onChange={changeHandler}>
-              {
-                selectItems.map((s, i) => {
-                  return (
-                    <option value={s.id} key={`${s.id}-${i}`}>{s.title}</option>
-                  )
-                })
-              }
-            </select>
-          </td>
-        )
-      }
-
-      const inputTypeHtml = inputType === InputTypes.number ? 'number' : 'text';
-      const defaultValue = props.values[rowIndex][valueIndex];
-      const disabled = props.inputTypes[valueIndex] == null;
-      return (
-        <td key={`${rowIndex}-${valueIndex}`}>
-          <input className={className} name={propertyId} onChange={changeHandler} disabled={disabled} type={inputTypeHtml}  defaultValue={defaultValue} />
-        </td>
-      )
+      return getInputElement(rowIndex, valueIndex, props.values[rowIndex][valueIndex]);
     }
 
     if (inputType === InputTypes.image){
       return (
         <td className="w-25" key={`${rowIndex}-${valueIndex}`}>
-          <img className="img-fluid img-thumbnail" src={`data:image/png;base64,${props.values[rowIndex][valueIndex].toString()}`}/>
+          <img className="img-fluid img-thumbnail" src={`data:image/png;base64,${props.values[rowIndex][valueIndex]?.toString() ?? ''}`}/>
         </td>
       )
     }
@@ -102,7 +115,7 @@ export function EditableTable(props: IEditableTableProps) {
   }
 
   const onSaveHandler = (rowIndex: number) => {
-    props.updateItemCallback(props.sourceObjs[rowIndex], form);
+    props.updateItem(props.sourceObjs[rowIndex], form);
     setEditableRow(null);
     setForm(new Map());
   }
@@ -112,8 +125,25 @@ export function EditableTable(props: IEditableTableProps) {
     setForm(new Map());
   }
 
+  const onAddNewHandler = () => {
+    setForm(new Map());
+    setEditableRow(newRowIndex);
+  }
+
+  const onSaveNewHandler = () => {
+    setEditableRow(null);
+    props.addNewItem(form);
+  }
+
   return (
     <div className="container-fluid">
+      <hr />
+      { props.canAddNew && (
+        <div>
+            <button className="btn btn-outline-primary btn-sm" onClick={onAddNewHandler}>Добавить</button>
+          <hr />
+        </div>
+      )}      
       <div className="row">
           <div className="col-12">
               <div className="card">
@@ -131,6 +161,19 @@ export function EditableTable(props: IEditableTableProps) {
                                   </tr>
                               </thead>
                               <tbody>
+                                  {editableRow === newRowIndex && 
+                                    (
+                                        <tr key={'newRow'} style={{cursor: 'pointer'}}>
+                                          {props.inputTypes.map((t, i) => {
+                                            return getInputElement(editableRow, i, null);
+                                          })}
+                                          <td>
+                                            <button className="btn btn-link btn-sm" onClick={onSaveNewHandler}>Сохранить</button>
+                                            <button className="btn btn-link btn-sm" onClick={onCancelHandler}>Отменить</button>
+                                          </td>
+                                        </tr>
+                                    )
+                                  }
                                   {props.values.map((v, i) => {
                                     return (
                                       <tr key={i} style={{cursor: 'pointer'}}>
@@ -140,7 +183,6 @@ export function EditableTable(props: IEditableTableProps) {
                                         <td>
                                           {editableRow === i && <button className="btn btn-link btn-sm" onClick={() => onSaveHandler(i)}>Сохранить</button>}
                                           {editableRow !== i && <button className="btn btn-link btn-sm" disabled={editableRow != null} onClick={() => onEditHanler(i)}>Изменить</button>}
-                                          {props.canDisable && editableRow !== i && <button className="btn btn-link btn-sm" disabled={editableRow != null}>Отключить</button>}
                                           {editableRow === i && <button className="btn btn-link btn-sm" onClick={onCancelHandler}>Отменить</button>}
                                         </td>
                                       </tr>)

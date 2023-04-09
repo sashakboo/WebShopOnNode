@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bcrypt from 'bcryptjs';
-import { GetUsers, UpdateUser } from "../services/users.js";
+import { GetUser, GetUserByEmail, GetUsers, UpdateUser } from "../services/users.js";
 import { Request, Response } from 'express';
 import Auth from "../middleware/auth.middleware.js";
 import { check, validationResult } from "express-validator";
@@ -37,7 +37,8 @@ usersRouter.post('/update',
       const { id, password, role } = req.body;
       const hashedPassword = await bcrypt.hash(password, 12);
       await UpdateUser(id, hashedPassword, role);
-      res.status(200).json('Пользователь обновлен');          
+      const user = await GetUser(id);
+      res.json(user);          
     } catch (e) {
       res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
     }

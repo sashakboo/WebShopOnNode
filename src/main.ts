@@ -8,6 +8,7 @@ import authRouter from './routes/auth.routes.js';
 import basketRouter from './routes/basket.routes.js';
 import usersRouter from './routes/users.routes.js';
 import categoriesRouter from './routes/categories.routes.js';
+import filesRouter from './routes/files.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -24,6 +25,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/basket', basketRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/categories', categoriesRouter);
+app.use('/api/files', filesRouter)
 
 if (process.env.NODE_ENV === 'production') {
   app.use('/', express.static(path.join(__dirname, 'client')));

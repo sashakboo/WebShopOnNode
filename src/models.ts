@@ -9,7 +9,7 @@ export interface IProduct {
     icon: string,
     title: string,
     price: number,
-    tag: string
+    isActive: boolean
 }
 
 export interface IBasketProduct {
@@ -18,13 +18,6 @@ export interface IBasketProduct {
     productId: number,
     categoryTitle: string,
     price: number
-}
-
-export interface ICreatedProduct {
-    categoryId: number,
-    title: string,
-    price: number,
-    isActive: boolean
 }
 
 export interface IUser {
@@ -44,5 +37,15 @@ export interface IUpdatedProduct {
     id: number,
     categoryId: number,
     title: string,
-    price: number
+    price: number,
+    isActive: boolean,
+    iconPath: string | null
+}
+
+export interface ICreatedProduct {
+    categoryId: number,
+    title: string,
+    price: number,
+    isActive: boolean,
+    iconPath: string | null
 }

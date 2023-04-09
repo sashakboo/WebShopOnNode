@@ -2,9 +2,25 @@ import { executeCommand } from "../database/database.js";
 import { IUser } from "../models.js";
 
 
-export async function GetUser(email: string): Promise<IUser | null> {
+export async function GetUserByEmail(email: string): Promise<IUser | null> {
   const commandText = 'SELECT id, email, password, role from public.users where email = $1::varchar';
   const params = [ email ];
+  const result = await executeCommand(commandText, params);
+  if (result.rowCount === 1) {
+      return Promise.resolve(
+          {
+              id: parseInt(result.rows[0]['id']),
+              email: result.rows[0]['email'],
+              password: result.rows[0]['password'],
+              role: result.rows[0]['role']
+          });
+  }
+  return null;
+}
+
+export async function GetUser(id: number): Promise<IUser | null> {
+  const commandText = 'SELECT id, email, password, role from public.users where id = $1::int';
+  const params = [ id ];
   const result = await executeCommand(commandText, params);
   if (result.rowCount === 1) {
       return Promise.resolve(
