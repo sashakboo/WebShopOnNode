@@ -1,7 +1,7 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import FilterPanel from "./FilterPanel";
 import Pagination from "./Pagination";
-import { ICategory, IProduct } from "../types/product";
+import { IProduct } from "../types/models";
 import Products from "./Products";
 import { useParams } from "react-router-dom";
 import { useHttp } from "../hooks/http.hook";
@@ -30,10 +30,8 @@ export default function FilteredProducts() {
 
     const { changeBasketCount } = useContext(NotifyContext);
 
-    const addToBasket = async (product: IProduct) => {
+    const addToBasketHandler = async (product: IProduct) => {
         try {
-            const apiUrl = `/api/basket/add/${product.id}`;
-            const response = await request(apiUrl, 'POST', null, { Authorization: `Bearer ${auth.token}` });  
             changeBasketCount(1); 
         } catch (e) { }
     }
@@ -42,7 +40,7 @@ export default function FilteredProducts() {
     return (
         <div>
             <FilterPanel />
-            <Products products={[...productList]} addToBasket={addToBasket} />
+            <Products products={[...productList]} addToBasketCallback={addToBasketHandler} />
             <Pagination/>
         </div>
     )

@@ -10,9 +10,7 @@ export default function LoginPage() {
       password: ''
     });
 
-    let infoMessage: string | null = null;
     const [ errorMessage, setErrorMessage ] = useState<string | null>(null);
-    const [ message, setMessage ] = useState<string | null>(null);
 
     useEffect(() => {
         setErrorMessage(error);

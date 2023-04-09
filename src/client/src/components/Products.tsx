@@ -1,9 +1,9 @@
 import ProductCard from "./ProductCard";
-import { IProduct } from "../types/product";
+import { IProduct } from "../types/models";
 
 export interface IProductsProps {
     products: Array<IProduct>
-    addToBasket: (product: IProduct) => void
+    addToBasketCallback: (product: IProduct) => void
 }
 
 export default function Products(props: IProductsProps) {
@@ -16,7 +16,7 @@ export default function Products(props: IProductsProps) {
                             props.products.map(p => {
                                 return (
                                     <div className="col-lg-3 col-md-6 mb-4" key={p.id}>
-                                        <ProductCard product={p} addToBasket={props.addToBasket} />
+                                        <ProductCard product={p} addToBasketCallback={props.addToBasketCallback} />
                                     </div>
                                 )
                             })

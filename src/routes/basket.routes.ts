@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AddToBasket, GetBasketCount, GetBasketProducts, GetProducts } from "../database.js";
+import { AddToBasket, GetBasketCount, GetBasketProducts, RemoveFromBasket } from "../services/products.js";
 import { Request, Response } from 'express';
 import Auth from "../middleware/auth.middleware.js";
 
@@ -47,6 +47,25 @@ basketRouter.post('/add/:id', Auth, async (req: Request, res: Response) => {
       }
       await AddToBasket(id, userId);
       res.status(200).json('Товар добален в корзину');          
+    } catch (e) {
+      res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
+    }
+  });
+
+  basketRouter.post('/delete/:id', Auth, async (req: Request, res: Response) => {
+    try {        
+      const id: number = parseInt(req.params.id);
+      if (Number.isNaN(id))
+      {
+        res.status(400);
+      }
+      const userId = parseInt(req.params.userId);
+      if (Number.isNaN(userId))
+      {
+        res.status(400);
+      }
+      await RemoveFromBasket(id, userId);
+      res.status(200).json('Товар удален из корзины');          
     } catch (e) {
       res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
     }

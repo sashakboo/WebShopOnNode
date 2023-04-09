@@ -20,29 +20,16 @@ export interface IBasketProduct {
     price: number
 }
 
-export interface ICreatedProduct {
-    categoryId: number,
-    title: string,
-    price: number,
-    isActive: boolean
-}
-
-export interface IUser {
-    id: number,
-    role: string,
-    email: string,
-    password: string,
-}
-
-export interface IUpdatedUser {
-    id: number,
-    password: string,
-    role: string
-}
-
 export interface IUpdatedProduct {
     id: number,
     categoryId: number,
     title: string,
     price: number
+}
+
+export interface IUser {
+    id: number,
+    email: string,
+    password: string,
+    role: string
 }

@@ -11,9 +11,9 @@ import { NotifyContext } from '../context/NotifyContext';
 export default function NavBar() {
     const { request } = useHttp();
     const { token, userId, logout } = useContext(AuthContext);
-    const isAuthenticated = !!token;
-    
+    const isAuthenticated = !!token;    
     const [ isAdmin, setIsAdmin] = useState(false);
+
     const fetchUserRole = async () => {
         try {
             if (!isAuthenticated || Number.isNaN(userId))
@@ -24,41 +24,53 @@ export default function NavBar() {
             const data = response as any;
             setIsAdmin(data.role === 'admin');    
         } catch (e) { }
-      }
+    }
 
     useEffect(() => {
         fetchUserRole();
     }, [token]);
 
-    const { basketCount } = useContext(NotifyContext);
+    const { basketCount, changeBasketCount, resetBasketCount } = useContext(NotifyContext);
+    const getBasketCount = async () => {
+        try {
+          if (!isAuthenticated)
+            resetBasketCount();
+
+          if (isAuthenticated && basketCount === 0) {
+            const apiUrl = '/api/basket/count';
+            const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${token}` });
+            const data = parseInt(response);
+            if (!Number.isNaN(data))
+              changeBasketCount(data); 
+          }   
+        } catch (e) { }
+    }
+    useEffect(() => { getBasketCount(); }, [ isAuthenticated ]);
 
     return (
         <div className="fixed-top">
             <nav className="navbar fixed-top navbar-expand navbar-light bg-white">
                 <div className="container">    
-                    <a className="navbar-brand mt-2 mt-sm-0" href="#">
+                    <Link className="navbar-brand mt-2 mt-sm-0" to="/">
                         <img src={brand} height="45" alt="Logo" />
-                    </a>
+                    </Link>
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item active">
                             <Link className="nav-link " to="/">Домой</Link>
                         </li>
-                        <li className="nav-item">
-                            <a className="nav-link" href="/about">О магазине</a>
-                        </li>
                         { isAdmin && isAuthenticated &&
                             (<li className="nav-item">
-                                <a className="nav-link" href="/admin">ЛК</a>
+                                <Link className="nav-link" to="/admin">Администрирование</Link>
                             </li>)
                         }
                     </ul>
                     <div className="d-flex align-items-center">
                         {
                             isAuthenticated && (
-                            <a className="nav-link me-3" href="#">
-                                <img className="fas fa-shopping-cart" src={basket} />
+                            <Link className="nav-link me-3" to="/basket">
+                                <img className="fas fa-shopping-cart" src={basket} alt="basket" />
                                 <span className="badge rounded-pill badge-notification bg-danger">{ basketCount }</span>
-                            </a>)
+                            </Link>)
                         }
                         {isAuthenticated
                             ? (<Link to="/auth" className="border rounded px-2 nav-link" onClick={logout}>

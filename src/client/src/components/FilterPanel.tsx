@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ICategory } from "../types/product";
+import { ICategory } from "../types/models";
 import { Link, NavLink, useParams } from "react-router-dom";
 
 export default function FilterPanel() {

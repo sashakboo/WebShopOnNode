@@ -3,9 +3,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from 'config';
 import { check, validationResult } from 'express-validator';
-import { IUser } from '../models.js';
-import {Express, Request, Response, NextFunction} from 'express';
-import { CreateUser, GetUser, GetUserRole } from '../database.js';
+import { Request, Response } from 'express';
+import { CreateUser, GetUser, GetUserRole } from '../services/users.js';
 import Auth from '../middleware/auth.middleware.js';
 
 interface ILoginBody {
@@ -74,7 +73,6 @@ authRouter.post(
   async (req: ILoginRequest, res: Response) => {
     try {
       const errors = validationResult(req);  
-      console.log('errors', errors);    
 
       if (!errors.isEmpty()) {
         return res.status(400).json({ 

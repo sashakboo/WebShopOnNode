@@ -1,8 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 export const useHttp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const auth = useContext(AuthContext);
 
   const request = useCallback( async (url: string, method: string = 'GET', body: string | null = null, headers: { [id: string] : string; } = {}) => {
     setLoading(true);
@@ -13,6 +15,11 @@ export const useHttp = () => {
       const response = await fetch(url, {
         method, body, headers
       });  
+
+      if (response.status === 401) {
+        auth.logout();
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
