@@ -10,10 +10,9 @@ import usersRouter from './routes/users.routes';
 import categoriesRouter from './routes/categories.routes';
 import filesRouter from './routes/files.routes';
 
-
-const __dirname = '.'
+const __dirname = '.' 
 const PORT = (process.env.PORT || config.get<number>('port') || 5000) as number;
-const IP = process.env.IP || '127.0.0.1';
+const IP = (process.env.IP || config.get<number>('ip') || '127.0.0.1') as string;
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,7 +27,6 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/files', filesRouter)
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('dirname', __dirname)
   app.use('/', express.static(path.join(__dirname, 'client')));
   
   app.get('*', (req, res) => {
@@ -37,4 +35,4 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, IP,  () => console.log(`App has been started on port ${PORT}`));
+app.listen(PORT, IP,  () => console.log(`App has been started on port: ${PORT}, IP: ${IP}`));

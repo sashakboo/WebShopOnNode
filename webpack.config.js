@@ -2,7 +2,8 @@
 
 import { resolve as _resolve } from "path";
 import webpack from "webpack";
-import nodeExternals from 'webpack-node-externals'
+import CopyPlugin from 'copy-webpack-plugin';
+import nodeExternals from 'webpack-node-externals';
 
 const isProduction = process.env.NODE_ENV == "production";
 
@@ -20,7 +21,13 @@ const config = {
   plugins: [
     // Add your plugins here
     // Learn more about plugins from https://webpack.js.org/configuration/plugins/
-    new webpack.IgnorePlugin({ resourceRegExp: /^pg-native$/ })
+    new webpack.IgnorePlugin({ resourceRegExp: /^pg-native$/ }),
+    new CopyPlugin({
+      patterns: [
+        { from: "./config", to: "./config" },
+        { from: "./config/default.json", to: "./config/production.json" }
+      ],
+    }),
   ],
   module: {
     rules: [

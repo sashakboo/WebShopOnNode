@@ -9,4 +9,8 @@
   },
   "files": ["src/index.ts"],
   "exclude": ["node_modules", "src/client"],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }
