@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 import config from 'config';
 import { check, validationResult } from 'express-validator';
 import { Request, Response } from 'express';
-import { CreateUser, GetUserByEmail, GetUserRole } from '../services/users.js';
-import Auth from '../middleware/auth.middleware.js';
+import { CreateUser, GetUserByEmail, GetUserRole } from '../services/users';
+import Auth from '../middleware/auth.middleware';
 
 interface ILoginBody {
     email: string;

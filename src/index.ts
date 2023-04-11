@@ -3,17 +3,17 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import config from 'config';
 import bodyParser from 'body-parser';
-import productsRouter from './routes/products.routes.js';
-import authRouter from './routes/auth.routes.js';
-import basketRouter from './routes/basket.routes.js';
-import usersRouter from './routes/users.routes.js';
-import categoriesRouter from './routes/categories.routes.js';
-import filesRouter from './routes/files.routes.js';
+import productsRouter from './routes/products.routes';
+import authRouter from './routes/auth.routes';
+import basketRouter from './routes/basket.routes';
+import usersRouter from './routes/users.routes';
+import categoriesRouter from './routes/categories.routes';
+import filesRouter from './routes/files.routes';
 
-const __filename = fileURLToPath(import.meta.url);
 
-const __dirname = path.dirname(__filename);
-const PORT = config.get<number>('port') || 5000;
+const __dirname = '.'
+const PORT = (process.env.PORT || config.get<number>('port') || 5000) as number;
+const IP = process.env.IP || '127.0.0.1';
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,6 +28,7 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/files', filesRouter)
 
 if (process.env.NODE_ENV === 'production') {
+  console.log('dirname', __dirname)
   app.use('/', express.static(path.join(__dirname, 'client')));
   
   app.get('*', (req, res) => {
@@ -36,4 +37,4 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT,  () => console.log(`App has been started on port ${PORT}`));
+app.listen(PORT, IP,  () => console.log(`App has been started on port ${PORT}`));

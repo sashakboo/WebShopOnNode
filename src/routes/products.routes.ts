@@ -1,9 +1,9 @@
 import fs from 'fs';
 import { Router } from "express";
-import { CreateProduct, GetProduct, GetProducts, UpdateProduct, UpdateProductIcon } from "../services/products.js";
+import { CreateProduct, GetProduct, GetProducts, UpdateProduct, UpdateProductIcon } from "../services/products";
 import { Request, Response } from 'express';
-import Auth from "../middleware/auth.middleware.js";
-import { ICreatedProduct, IUpdatedProduct } from "../models.js";
+import Auth from "../middleware/auth.middleware";
+import { ICreatedProduct, IUpdatedProduct } from "../models";
 
 interface ICreatedProductRequest extends Request {
   body: ICreatedProduct

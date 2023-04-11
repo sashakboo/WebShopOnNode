@@ -1,10 +1,10 @@
 import { Router } from "express";
 import bcrypt from 'bcryptjs';
-import { GetUser, GetUserByEmail, GetUsers, UpdateUser } from "../services/users.js";
+import { GetUser, GetUsers, UpdateUser } from "../services/users";
 import { Request, Response } from 'express';
-import Auth from "../middleware/auth.middleware.js";
+import Auth from "../middleware/auth.middleware";
 import { check, validationResult } from "express-validator";
-import { IUpdatedUser } from "../models.js";
+import { IUpdatedUser } from "../models";
 
 interface IUserRequest extends Request {
   body: IUpdatedUser

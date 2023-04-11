@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { GetCategories } from "../services/products.js";
+import { GetCategories } from "../services/products";
 import { Request, Response } from 'express';
-import Auth from "../middleware/auth.middleware.js";
+import Auth from "../middleware/auth.middleware";
 
 const categoriesRouter = Router();
 

@@ -1,8 +1,7 @@
 import { Router } from "express";
 import { Request, Response } from 'express';
 import multer from 'multer';
-import Auth from "../middleware/auth.middleware.js";
-import fs from 'fs';
+import Auth from "../middleware/auth.middleware";
 
 const filesRouter = Router();
 const upload = multer({ dest: './uploads/' })

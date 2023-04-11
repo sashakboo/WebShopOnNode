@@ -1,5 +1,5 @@
-import { executeCommand } from "../database/database.js";
-import { IUser } from "../models.js";
+import { executeCommand } from "../database/database";
+import { IUser } from "../models";
 
 
 export async function GetUserByEmail(email: string): Promise<IUser | null> {

@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { executeCommand } from "../database/database.js";
-import { IProduct, IBasketProduct, ICreatedProduct, ICategory, IUpdatedProduct } from "../models.js";
+import { executeCommand } from "../database/database";
+import { IProduct, IBasketProduct, ICreatedProduct, ICategory, IUpdatedProduct } from "../models";
 
 export async function GetCategories(): Promise<Array<ICategory>> {
   const commandText = 'select id, title from productscategory';

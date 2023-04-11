@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { AddToBasket, GetBasketCount, GetBasketProducts, RemoveFromBasket } from "../services/products.js";
+import { AddToBasket, GetBasketCount, GetBasketProducts, RemoveFromBasket } from "../services/products";
 import { Request, Response } from 'express';
-import Auth from "../middleware/auth.middleware.js";
+import Auth from "../middleware/auth.middleware";
 
 const basketRouter = Router();
 
