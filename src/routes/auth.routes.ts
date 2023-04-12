@@ -67,7 +67,7 @@ authRouter.post(
 authRouter.post(
   '/login', 
   [
-    check('email', 'Введите корректный email').normalizeEmail().isEmail(),
+    check('email', 'Введите email').exists(),
     check('password', 'Введите пароль').exists()
   ],
   async (req: ILoginRequest, res: Response) => {
