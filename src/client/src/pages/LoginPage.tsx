@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useHttp } from '../hooks/http.hook';
+import { Loader } from '../components/Loader';
 
 export default function LoginPage() {
     const auth = useContext(AuthContext);
@@ -40,6 +41,7 @@ export default function LoginPage() {
 
     return (
         <div className="container" style={{maxWidth: `500px`}}>
+            { loading && <Loader /> }
             <h3  className="mb-3">
                 Авторизация
             </h3>
@@ -84,9 +86,7 @@ export default function LoginPage() {
                     Регистрация
                 </button>
             </form>
-            {
-                error != null ? <div className="alert alert-danger mb-3" role="alert">{errorMessage}</div> : null
-            }
+            { error != null && <div className="alert alert-danger mb-3" role="alert">{errorMessage}</div> }
         </div>
     )
 }

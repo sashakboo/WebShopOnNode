@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { EditableTable, IEditableTableProps, InputTypes } from "../components/EditableTable";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
-import { ICategory, ICreatedProduct, IProduct, IUpdatedProduct, IUser } from "../types/models";
+import { ICategory, ICreatedProduct, IOrder, IOrderState, IProduct, IUpdatedProduct, IUser } from "../types/models";
+import { Loader } from "../components/Loader";
 
 interface ITab {
   id: string, 
@@ -36,8 +37,10 @@ export default function AdminPage() {
 
   const [ users, setUsers ] = useState<Array<IUser>>([]);
   const [ products, setProducts ] = useState<Array<IProduct>>([]);
+  const [ orders, setOrders ] = useState<Array<IOrder>>([]);
+  const [ orderStates, setOrderStates ] = useState<Array<IOrderState>>([]);
   const [ categories, setCategories ] = useState<Array<ICategory>>([]);
-  const { request, error, clearError } = useHttp();
+  const { request, error, clearError, loading } = useHttp();
   const auth = useContext(AuthContext);
 
   let tableProps: IEditableTableProps = {
@@ -85,6 +88,26 @@ export default function AdminPage() {
       setCategories([...loadedCategopries]);
     }
     getCategories();
+  }, []);
+
+  useEffect(() => {
+    async function getOrderStates() {
+      const apiUrl = '/api/orders/states';
+      const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${auth.token}` });
+      const loadedOrderStates= response as Array<IOrderState>;
+      setOrderStates([...loadedOrderStates]);
+    }
+    getOrderStates();
+  }, []);
+
+  useEffect(() => {
+    async function getOrders() {
+      const apiUrl = '/api/orders';
+      const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${auth.token}` });
+      const loadedOrders= response as Array<IOrder>;
+      setOrders([...loadedOrders]);
+    }
+    getOrders();
   }, []);
 
   if (activeTab.id === 'users') {
@@ -214,14 +237,32 @@ export default function AdminPage() {
       addNewItem: addProductHandler
     }
   }
+
+  if (activeTab.id === 'orders') {
+    const stateSelectItems = orderStates.map(c => ({ id: c.id, title: c.title }));
+    tableProps = {
+      columnsIds: [ 'id', 'created', 'customerEmail', 'state', 'itemsCount', 'totalCost' ],
+      columnsTitle: [ 'ID', 'Создано', 'Email', 'Состояние', 'Кол-во позиций', 'Сумма' ],
+      inputTypes: [ null, null, null, InputTypes.select, null, null ],
+      selectItems: [ null, null, null, stateSelectItems, null, null ],
+      values: orders.map((p) => {
+        return [ p.id, new Date(p.created).toLocaleDateString(), p.customerEmail, p.state, p.itemsCount, p.totalCost]
+      }),
+      sourceObjs: [ ...orders ],
+      canAddNew: true,
+      updateItem: () => {},
+      addNewItem: () => {}
+    } 
+  }
   
 
   return (
     <div className="container-fluid">
       <ul className="nav nav-tabs">
         {tabsElement}
-        <EditableTable {...tableProps}/>
       </ul>
+      {loading && <Loader />}
+        <EditableTable {...tableProps}/>
     </div>
   )
 }

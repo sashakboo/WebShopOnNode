@@ -136,12 +136,10 @@ export function EditableTable(props: IEditableTableProps) {
   }
 
   return (
-    <div className="container-fluid">
-      <hr />
+    <div className="container-fluid my-2">
       { props.canAddNew && (
-        <div>
+        <div className="my-2">
             <button className="btn btn-outline-primary btn-sm" onClick={onAddNewHandler}>Добавить</button>
-          <hr />
         </div>
       )}      
       <div className="row">

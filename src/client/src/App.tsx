@@ -1,18 +1,15 @@
 import NavBar from './components/NavBar';
 import Footer from './components/Footer';
 import { useRoutes } from './Routes';
-import { BrowserRouter, Route, Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
 import { useAuth } from './hooks/auth.hook';
-
-import './App.css';
 import { NotifyContext } from './context/NotifyContext';
 import { useNotify } from './hooks/notify.hook';
-import { useEffect } from 'react';
-import { useHttp } from './hooks/http.hook';
+import './App.css';
 
 function App() {
-  const { token, login, logout, userId, ready } = useAuth();
+  const { token, login, logout, userId } = useAuth();
   const isAuthenticated = !!token;  
   const routes = useRoutes(isAuthenticated);
   const { basketCount, changeBasketCount, resetBasketCount } = useNotify(); 

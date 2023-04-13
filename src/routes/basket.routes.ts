@@ -64,7 +64,7 @@ basketRouter.post('/add/:id', Auth, async (req: Request, res: Response) => {
       {
         res.status(400);
       }
-      await RemoveFromBasket(id, userId);
+      await RemoveFromBasket(id);
       res.status(200).json('Товар удален из корзины');          
     } catch (e) {
       res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });

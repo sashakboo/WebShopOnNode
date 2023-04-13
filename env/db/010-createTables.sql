@@ -103,7 +103,8 @@ create table orders
             references users,
     state    bigint                                                  not null
         constraint orders_orderstates_id_fk
-            references orderstates
+            references orderstates,
+    created  date   default now()                                    not null
 );
 
 alter table orders

@@ -7,11 +7,12 @@ import { useParams } from "react-router-dom";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
 import { NotifyContext } from "../context/NotifyContext";
+import { Loader } from "./Loader";
 
 export default function FilteredProducts() {
     const [ productList, setProducts ] = useState<Array<IProduct>>([]);
 
-    const { request } = useHttp();
+    const { request, loading } = useHttp();
     const auth = useContext(AuthContext);
     const categoryId = parseInt(useParams().id ?? '');
 
@@ -36,9 +37,10 @@ export default function FilteredProducts() {
         } catch (e) { }
     }
 
-
     return (
         <div>
+
+            {loading && <Loader />}
             <FilterPanel />
             <Products products={[...productList]} addToBasketCallback={addToBasketHandler} />
             <Pagination/>

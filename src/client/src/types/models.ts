@@ -37,6 +37,25 @@ export interface ICreatedProduct {
     isActive: boolean
 }
 
+export interface ICreatedOrder {
+    products: Array<{ id: number, orderPrice: number, basketItemId: number }>
+}
+
+export interface IOrder {
+    id: number,
+    created: Date,
+    customerEmail: string,
+    state: string,
+    itemsCount: number,
+    totalCost: number
+}
+
+export interface IOrderState {
+    id: number,
+    name: string,
+    title: string
+}
+
 export interface IUser {
     id: number,
     email: string,

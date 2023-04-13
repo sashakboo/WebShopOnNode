@@ -105,16 +105,12 @@ export async function GetBasketCount(userId: number): Promise<number> {
 export async function AddToBasket(productId: number, userId: number): Promise<void> {
   const commandText = 'insert into public.basket (product, customer) values ($1::int, $2::int) RETURNING id';
   const params = [ productId, userId ];
-  const results = await executeCommand(commandText, params);
-  if (results.rowCount === 1)
-  {
-    console.log('new basket item', results.rows[0]['id']);
-  }
+  await executeCommand(commandText, params);
 }
 
-export async function RemoveFromBasket(productId: number, userId: number): Promise<void> {
-  const commandText = 'delete from public.basket where id = $1::int and customer = $2::int';
-  const params = [ productId, userId ];
+export async function RemoveFromBasket(id: number): Promise<void> {
+  const commandText = 'delete from public.basket where id = $1::int';
+  const params = [ id ];
   await executeCommand(commandText, params);
 }
 

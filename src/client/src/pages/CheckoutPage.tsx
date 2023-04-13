@@ -1,11 +1,14 @@
 import { useContext, useEffect, useState } from 'react';
 import { useHttp } from "../hooks/http.hook"
-import { IBasketProduct, IProduct } from "../types/models";
+import { IBasketProduct, ICreatedOrder, IProduct } from "../types/models";
 import { AuthContext } from '../context/AuthContext';
 import { NotifyContext } from '../context/NotifyContext';
+import { Link } from 'react-router-dom';
+import { Loader } from '../components/Loader';
 
 export default function CheckoutPage() {
-    const [ productList, setProducts ] = useState<Array<IBasketProduct>>([]);
+    const [ basketItems, setBasketItems ] = useState<Array<IBasketProduct>>([]);
+    const [ orderDone, setOrderDone ] = useState(false);
 
     const { loading, request } = useHttp();
     const auth = useContext(AuthContext);
@@ -15,7 +18,7 @@ export default function CheckoutPage() {
             const apiUrl = `/api/basket`;
             const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${auth.token}` });
             const data = response as Array<IBasketProduct>;
-            setProducts(data);    
+            setBasketItems(data);    
         } catch (e) { }
       }
 
@@ -23,15 +26,34 @@ export default function CheckoutPage() {
         fetchProducts();
     }, []);
 
-    const { changeBasketCount } = useContext(NotifyContext);
+    const { changeBasketCount, resetBasketCount } = useContext(NotifyContext);
 
     const removeFromBasket = async (product: IBasketProduct) => {
         try {
             changeBasketCount(-1); 
             const apiUrl = `/api/basket/delete/${product.id}`;
             await request(apiUrl, 'POST', null, { Authorization: `Bearer ${auth.token}` });  
-            setProducts(productList.filter(x => x.id !== product.id));
+            setBasketItems(basketItems.filter(x => x.id !== product.id));
         } catch (e) { }
+    }
+
+    const createOrder = async () => {
+        const apiUrl = '/api/orders/create';
+        const createdOrder: ICreatedOrder = {
+            products: basketItems.map(p => ({ id: p.productId, orderPrice: p.price, basketItemId: p.id }))
+        };
+        await request(apiUrl, 'POST', JSON.stringify(createdOrder), { Authorization: `Bearer ${auth.token}` });  
+        setBasketItems([]);
+        resetBasketCount();
+        setOrderDone(true);
+    }
+
+    if (orderDone){
+        return (
+            <div className="container">
+                <Link to="/">Вернуться к покупкам</Link>
+            </div>
+        )
     }
 
     return (
@@ -93,7 +115,7 @@ export default function CheckoutPage() {
                         </div>
                     </div>
                     <hr className="mb-4" />                    
-                <button className="btn btn-primary" type="button">Заказать</button>
+                <button className="btn btn-primary" type="button" onClick={createOrder}>Заказать</button>
                 </div>
                 {/*/.Card*/}
             </div>
@@ -104,13 +126,13 @@ export default function CheckoutPage() {
                 {/* Heading */}
                 <h4 className="d-flex justify-content-between align-items-center mb-3">
                     <span className="text-muted">Заказ</span>
-                    <span className="badge rounded-pill badge-primary">3</span>
                 </h4>
+                {loading && <Loader />}
 
                 {/* Cart */}
                 <ul className="list-group mb-3">
                     {
-                        productList.map((p, i) => {
+                        basketItems.map((p, i) => {
                             return (
                             <li className="list-group-item d-flex justify-content-between" key={`${p.id}-${i}`}>
                                 <div>
@@ -126,7 +148,7 @@ export default function CheckoutPage() {
                     }  
                     <li className="list-group-item d-flex justify-content-between" key={"total"}>
                         <span>Итого</span>
-                        <strong>{productList.reduce((acc:number, p) => acc + (p.price as number), 0)} р.</strong>
+                        <strong>{basketItems.reduce((acc:number, p) => acc + (p.price as number), 0)} р.</strong>
                     </li>
                 </ul>
                 {/* Cart */}
