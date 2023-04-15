@@ -3,7 +3,6 @@
 import { resolve as _resolve } from "path";
 import webpack from "webpack";
 import CopyPlugin from 'copy-webpack-plugin';
-import nodeExternals from 'webpack-node-externals';
 
 const isProduction = process.env.NODE_ENV == "production";
 
@@ -48,7 +47,6 @@ const config = {
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
   },
-  externals: [nodeExternals()],
 };
 
 export default () => {
