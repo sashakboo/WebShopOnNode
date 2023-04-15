@@ -32,7 +32,7 @@ authRouter.post(
         if (!errors.isEmpty()) {
           return res.status(400).json({ 
             errors: errors.array(),
-            message: 'Некорректные данные при регистрации.'
+            message: 'Некорректные данные: ' + errors.array().reduce((acc, v) => acc + v.msg + ', ', '')
            });
         }      
   
