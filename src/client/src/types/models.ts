@@ -56,6 +56,11 @@ export interface IOrderState {
     title: string
 }
 
+export interface IUpdateOrderState {
+    orderId: number,
+    state: number
+}
+
 export interface IUser {
     id: number,
     email: string,

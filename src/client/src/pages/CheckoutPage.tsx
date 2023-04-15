@@ -59,11 +59,9 @@ export default function CheckoutPage() {
             carddate: form.get('carddate'),
             cardcvv: form.get('cardcvv'),
         };
-        console.log(formItems)
         const empties = Object.keys(formItems).filter(i => {
             return form.get(i) == null;              
         });
-        console.log(empties)
         if (empties.length > 0) {
             setFormError(empties);
             return;

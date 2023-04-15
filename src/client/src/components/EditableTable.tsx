@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ErrorMessage from "./ErrorMessage";
 
 export enum InputTypes {
   text,
@@ -28,6 +29,23 @@ export function EditableTable(props: IEditableTableProps) {
   const newRowIndex = -1;
   const [ editableRow, setEditableRow ] = useState<null | number>(null);
   const [ form, setForm ] = useState<Map<string, any>>(new Map());
+  const [ errorMessage, setErrorMessage ] = useState<string | null>(null);
+
+  const validateNewForm = (): boolean => {
+    if (editableRow !== newRowIndex)
+      return true;
+
+    const editableKeys = props.columnsIds.filter((c, i) => props.inputTypes[i] != null);
+    const emptyItems = editableKeys.map((id, i) => {
+      if (form.get(id) == null)
+        return { id: id, index: i }
+      
+      return null;      
+    }).filter(e => e != null);
+    
+    return emptyItems.length == 0;
+  }
+
   const changeHandler = (event: React.FormEvent<HTMLSelectElement | HTMLInputElement>) => {
     if (event.currentTarget == null){
       return;
@@ -136,6 +154,11 @@ export function EditableTable(props: IEditableTableProps) {
   }
 
   const onSaveNewHandler = () => {
+    const isValid = validateNewForm();
+    if (!isValid) {
+      setErrorMessage('Заполните все поля формы.');
+      return;
+    }
     setEditableRow(null);
     props.addNewItem(form);
   }
@@ -151,6 +174,7 @@ export function EditableTable(props: IEditableTableProps) {
           <div className="col-12">
               <div className="card">
                   <div className="card-body">
+                      {errorMessage && <ErrorMessage message={errorMessage} close={() => setErrorMessage(null)} />}
                       <div className="table-responsive">
                           <table className="table table-editable table-nowrap align-middle table-edits">
                               <thead>

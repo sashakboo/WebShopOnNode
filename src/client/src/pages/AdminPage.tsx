@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { EditableTable, IEditableTableProps, InputTypes } from "../components/EditableTable";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
-import { ICategory, ICreatedProduct, IOrder, IOrderState, IProduct, IUpdatedProduct, IUser } from "../types/models";
+import { ICategory, ICreatedProduct, IOrder, IOrderState, IProduct, IUpdateOrderState, IUpdatedProduct, IUser } from "../types/models";
 import { Loader } from "../components/Loader";
 import ErrorMessage from "../components/ErrorMessage";
 
@@ -56,7 +56,6 @@ export default function AdminPage() {
     updateItem: (sourceObj, form) => { },
     addNewItem: () => { }
   };
-
 
   useEffect(() => {
     async function getUsers() {
@@ -138,49 +137,34 @@ export default function AdminPage() {
     }
   
     const updateUser = async (user: IUser) => {
-      try {
-        const apiUrl = '/api/users/update';
-        const response = await request(apiUrl, 'POST', JSON.stringify({ id: user.id, password: user.password, role: user.role }), { Authorization: `Bearer ${auth.token}` });
-        return response as IUser;
-      } catch (e) { }
+      const apiUrl = '/api/users/update';
+      const response = await request(apiUrl, 'POST', JSON.stringify({ id: user.id, password: user.password, role: user.role }), { Authorization: `Bearer ${auth.token}` });
+      return response as IUser;
     }
   }
 
   if (activeTab.id === 'products') {
     const createIcon = async(file: File) => {
-      try {
-        if (file.size > 1)
-        {
-          throw new Error('Размер файла должен быть не больше 100 КБ')
-        }
-        const apiUrl = `/api/files/createicon`;
-        const formData = new FormData();
-        formData.append('icon', file);
-        const response = await request(apiUrl, 'POST', formData, { Authorization: `Bearer ${auth.token}` });
-        return response.filePath as string;
-      } catch (error) { 
-        
-      }
+      const apiUrl = `/api/files/createicon`;
+      const formData = new FormData();
+      formData.append('icon', file);
+      const response = await request(apiUrl, 'POST', formData, { Authorization: `Bearer ${auth.token}` });
+      return response.filePath as string;
     }
   
     const updateProduct = async (product: IUpdatedProduct) => {
-      try {
-        const apiUrl = '/api/products/update';
-        const response = await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
-        return response as IProduct;
-      } catch (error) { }
+      const apiUrl = '/api/products/update';
+      const response = await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
+      return response as IProduct;
     }
 
     const createProduct = async (product: ICreatedProduct) => {
-      try {
-        const apiUrl = '/api/products/create';
-        const response = await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
-        return response as IProduct;
-      } catch (error) { }
+      const apiUrl = '/api/products/create';
+      const response = await request(apiUrl, 'POST', JSON.stringify(product), { Authorization: `Bearer ${auth.token}` });
+      return response as IProduct;
     }
 
     const updateProductHandler = async (sourceObj: object, form: Map<string, any>) => {
-      console.log(form)
       const icon = form.get('icon') as File;
       let iconPath = null;
       if (icon != null) {
@@ -241,6 +225,19 @@ export default function AdminPage() {
   }
 
   if (activeTab.id === 'orders') {
+    const updateOrderState = async (order: IUpdateOrderState) => {
+      await request('/api/orders/changestate', 'POST', JSON.stringify(order), { Authorization: `Bearer ${auth.token}` });
+      setOrders([...orders.map(o => {
+        if (o.id == order.orderId){
+          return {
+            ...o,
+            state: orderStates.find(s => s.id == order.state)?.title ?? o.state
+          }
+        }
+        return o;
+      })])
+    }
+
     const stateSelectItems = orderStates.map(c => ({ id: c.id, title: c.title }));
     tableProps = {
       columnsIds: [ 'id', 'created', 'customerEmail', 'state', 'itemsCount', 'totalCost' ],
@@ -252,13 +249,36 @@ export default function AdminPage() {
       }),
       sourceObjs: [ ...orders ],
       canAddNew: false,
-      updateItem: () => {},
+      updateItem: async (sourceObj, form) => {
+        const order = sourceObj as IOrder;
+        const updatedOrderState = {
+          orderId: order.id,
+          state: form.get('state') as number
+        }
+        await updateOrderState(updatedOrderState);
+      },
       addNewItem: () => {}
     } 
   }
 
   if (activeTab.id === 'categories') {
-    const stateSelectItems = orderStates.map(c => ({ id: c.id, title: c.title }));
+    const createCategory = async (title: string) => {
+      const response = await request(`/api/categories/create/${title}`, 'POST', null, { Authorization: `Bearer ${auth.token}` });
+      const category = response as ICategory;
+      setCategories([ category, ...categories ]);
+    }
+
+    const updateCategory = async (category: ICategory) => {
+      const response = await request(`/api/categories/update`, 'POST', JSON.stringify(category), { Authorization: `Bearer ${auth.token}` });
+      const updatedCategory = response as ICategory;
+      setCategories(categories.map(p => {
+        if (p.id === updatedCategory?.id)
+          return updatedCategory;
+
+        return p;
+      }));
+    }
+
     tableProps = {
       columnsIds: [ 'id', 'title' ],
       columnsTitle: [ 'ID', 'Наименование' ],
@@ -269,9 +289,16 @@ export default function AdminPage() {
       }),
       sourceObjs: [ ...categories ],
       canAddNew: true,
-      updateItem: () => {},
-      addNewItem: (form) => {
-        setCategories([ { id: form.get('id'), title: form.get('title')}, ...categories])
+      updateItem: async (sourceObj, form) => {
+        const sourceCategory = sourceObj as ICategory;
+        const category = {
+          ...sourceCategory,
+          title: form.get('title') ?? sourceCategory.title
+        }
+        await updateCategory(category);
+      },
+      addNewItem: async (form) => {
+        await createCategory(form.get('title'));
       }
     } 
   }

@@ -6,7 +6,6 @@ import AdminPage from './pages/AdminPage';
 
 export const useRoutes = (isAuthenticated: boolean) => {
     if (!isAuthenticated) {
-        console.log(isAuthenticated)
         return (
             <Routes>
                 <Route path="/auth" element={<LoginPage />} />

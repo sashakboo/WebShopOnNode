@@ -1,10 +1,19 @@
 import { Router } from "express";
-import { CreateOrder, GetAllOrders, GetOrderStates } from "../services/orders";
+import { CreateOrder, GetAllOrders, GetOrderStates, SetOrderState } from "../services/orders";
 import { Request, Response } from 'express';
 import Auth from "../middleware/auth.middleware";
-import { ICreatedOrder } from "../models";
+import { ICreatedOrder, IUpdateOrderState } from "../models";
 
 const orderRouter = Router();
+
+interface ISetOrderStateRequest extends Request {
+  body: IUpdateOrderState
+}
+
+interface ICreateOrderRequest extends Request {
+  body: ICreatedOrder
+}
+
 
 orderRouter.get('/', Auth, async(req: Request, res: Response) => {
   try {   
@@ -24,11 +33,6 @@ orderRouter.get('/states', Auth, async (req: Request, res: Response) => {
   }
 });
 
-
-interface ICreateOrderRequest extends Request {
-  body: ICreatedOrder
-}
-
 orderRouter.post('/create', Auth, async(req: ICreateOrderRequest, res: Response) => {
   try {
     const userId = parseInt(req.params.userId);
@@ -44,5 +48,17 @@ orderRouter.post('/create', Auth, async(req: ICreateOrderRequest, res: Response)
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });
+
+orderRouter.post('/changestate', Auth, async(req: ISetOrderStateRequest, res: Response) => {
+  try {
+    const orderState = req.body;
+    await SetOrderState(orderState);
+    res.status(200).json('done');       
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
+  }
+});
+
 
 export default orderRouter;

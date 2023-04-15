@@ -1,5 +1,5 @@
 import { executeCommand } from "../database/database";
-import { ICreatedOrder, IOrder, IOrderState } from "../models";
+import { ICreatedOrder, IOrder, IOrderState, IUpdateOrderState } from "../models";
 import { RemoveFromBasket } from "./products";
 
 const orderStates: Array<IOrderState> = [];
@@ -13,7 +13,6 @@ export async function GetAllOrders(): Promise<Array<IOrder>> {
     'group by o.id, o.created, u.email, os.title ' +
     'order by o.created, o.state, o.id'  
 
-  console.log(commandText)
   const result = await executeCommand(commandText, []);
   const orders: Array<IOrder> = result.rows.map(r => {
     return {
@@ -38,6 +37,11 @@ export async function GetOrderStates(): Promise<Array<IOrderState>> {
       title: r['title']
     }
   });
+}
+
+export async function SetOrderState(order: IUpdateOrderState) {
+  const commandText = 'update public.orders set state = $1::int where id = $2::int';
+  await executeCommand(commandText, [ order.state, order.orderId ]);
 }
 
 export async function CreateOrder(userId:number, createdOrder: ICreatedOrder): Promise<number> {

@@ -57,7 +57,11 @@ productsRouter.post('/create', Auth, async (req: ICreatedProductRequest, res: Re
     }
     if (product.iconPath != null) {
       await UpdateProductIcon(productId, product.iconPath);
-      fs.unlink(product.iconPath, () => {});
+      fs.unlink(product.iconPath, (err) => {
+        if (err) 
+          console.error(`Cannot delete file: ${product.iconPath}`);
+        console.log(`File was deleted: ${product.iconPath}`);
+      });
     }
     const updatedProduct = await GetProduct(productId);
     res.json(updatedProduct);  

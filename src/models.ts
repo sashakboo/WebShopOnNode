@@ -68,3 +68,8 @@ export interface IOrderState {
     name: string,
     title: string
 }
+
+export interface IUpdateOrderState {
+    orderId: number,
+    state: number
+}

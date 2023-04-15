@@ -13,8 +13,27 @@ export async function GetCategories(): Promise<Array<ICategory>> {
   });
 }
 
+export async function CreateCategory(categoryName: string): Promise<ICategory> {
+  const commandText = 'insert into public.productscategory(title) values ($1::string) RETURNING id;';
+  const results = await executeCommand(commandText, [ categoryName ]);
+  if (results.rowCount === 0){
+    throw new Error(`Не удалось создать категорию ${categoryName}`);
+  }
+
+  return {
+    id: parseInt(results.rows[0]['id']),
+    title: categoryName
+  } as ICategory;
+}
+
+export async function UpdateCategory(category: ICategory): Promise<ICategory> {
+  const commandText = 'update public.productscategory set title = $1::string where id = $2::int';
+  await executeCommand(commandText, [ category.title, category.id ]);
+  return category;
+}
+
 export async function GetProduct(id: number): Promise<IProduct | null> {
-  let commandText = 'SELECT ' +
+  const commandText = 'SELECT ' +
     'p.id, p.title, c.id as categoryid, c.title as categorytitle, p.price, cast(active as string) active, convert_from(p.icon, \'UTF8\') as icon ' + 
     'FROM public.products as p inner join public.productscategory c on p.category = c.id where p.id = $1::int';
   const results = await executeCommand(commandText, [id]);
