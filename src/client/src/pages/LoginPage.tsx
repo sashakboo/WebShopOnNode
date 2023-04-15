@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useHttp } from '../hooks/http.hook';
 import { Loader } from '../components/Loader';
+import ErrorMessage from '../components/ErrorMessage';
 
 export default function LoginPage() {
     const auth = useContext(AuthContext);
@@ -86,7 +87,7 @@ export default function LoginPage() {
                     Регистрация
                 </button>
             </form>
-            { error != null && <div className="alert alert-danger mb-3" role="alert">{errorMessage}</div> }
+            { error != null && <ErrorMessage message={error} close={clearError} /> }
         </div>
     )
 }

@@ -58,11 +58,6 @@ export default function NavBar() {
                         <li className="nav-item active">
                             <Link className="nav-link " to="/">Домой</Link>
                         </li>
-                        { isAdmin && isAuthenticated &&
-                            (<li className="nav-item">
-                                <Link className="nav-link" to="/admin">Администрирование</Link>
-                            </li>)
-                        }
                     </ul>
                     <div className="d-flex align-items-center">
                         {
@@ -72,14 +67,15 @@ export default function NavBar() {
                                 <span className="badge rounded-pill badge-notification bg-danger">{ basketCount }</span>
                             </Link>)
                         }
-                        {isAuthenticated
-                            ? (<Link to="/auth" className="border rounded px-2 nav-link" onClick={logout}>
-                                <i className="fab me-2"></i>Выйти
+                        { isAdmin && isAuthenticated &&
+                            (<Link className="border rounded px-2 nav-link mx-2" to="/admin">
+                                <i className="fab me-2"></i>Администрирование
                             </Link>)
-                            : (<Link to="/auth" className="border rounded px-2 nav-link">
-                                    <i className="fab me-2"></i>Войти
-                            </Link>)}
-                        
+                        }
+                        {isAuthenticated && 
+                            (<Link to="/auth" className="border rounded px-2 nav-link mx-2" onClick={logout}>
+                                <i className="fab me-2"></i>Выйти
+                            </Link>)}                        
                     </div>
                     {/* Right elements */}
                 

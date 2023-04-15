@@ -22,7 +22,7 @@ export default function ProductCard(props: IProductCardProps) {
 
     return (
         
-        <div className="card" style={{width: '18rem'}}>
+        <div className="card" style={{maxWidth: '18rem'}}>
             <img src={`data:image/png;base64,${props.product.icon}`} className="card-img-top" alt={props.product.title} />
             <div className="card-body">
                 <h5 className="card-title">{props.product.title}</h5>

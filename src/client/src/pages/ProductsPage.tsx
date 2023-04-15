@@ -1,15 +1,14 @@
 import { useContext, useEffect, useState } from "react";
-import FilterPanel from "./FilterPanel";
-import Pagination from "./Pagination";
+import FilterPanel from "../components/FilterPanel";
 import { IProduct } from "../types/models";
-import Products from "./Products";
+import ProductList from "../components/ProductList";
 import { useParams } from "react-router-dom";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
 import { NotifyContext } from "../context/NotifyContext";
-import { Loader } from "./Loader";
+import { Loader } from "../components/Loader";
 
-export default function FilteredProducts() {
+export default function ProductsPage() {
     const [ productList, setProducts ] = useState<Array<IProduct>>([]);
 
     const { request, loading } = useHttp();
@@ -39,11 +38,9 @@ export default function FilteredProducts() {
 
     return (
         <div>
-
             {loading && <Loader />}
             <FilterPanel />
-            <Products products={[...productList]} addToBasketCallback={addToBasketHandler} />
-            <Pagination/>
+            <ProductList products={[...productList]} addToBasketCallback={addToBasketHandler} />
         </div>
     )
 }

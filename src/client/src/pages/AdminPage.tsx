@@ -149,12 +149,18 @@ export default function AdminPage() {
   if (activeTab.id === 'products') {
     const createIcon = async(file: File) => {
       try {
+        if (file.size > 1)
+        {
+          throw new Error('Размер файла должен быть не больше 100 КБ')
+        }
         const apiUrl = `/api/files/createicon`;
         const formData = new FormData();
         formData.append('icon', file);
         const response = await request(apiUrl, 'POST', formData, { Authorization: `Bearer ${auth.token}` });
         return response.filePath as string;
-      } catch (error) { }
+      } catch (error) { 
+        
+      }
     }
   
     const updateProduct = async (product: IUpdatedProduct) => {
@@ -187,10 +193,8 @@ export default function AdminPage() {
         title: form.get('title') as string ?? product.title,
         price: form.get('price') as number ?? product.price,
         iconPath: iconPath ?? null,
-        isActive: form.get('isactive') == 1 ?? true
+        isActive: form.get('isactive') == null ? product.isActive : form.get('isactive') == 1 ?? false
       }
-      console.log(form.get('isactive'))
-      console.log(updatedProduct)
 
       const updateResult = await updateProduct(updatedProduct);
       setProducts(products.map(p => {
