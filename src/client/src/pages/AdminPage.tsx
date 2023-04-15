@@ -5,6 +5,7 @@ import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
 import { ICategory, ICreatedProduct, IOrder, IOrderState, IProduct, IUpdatedProduct, IUser } from "../types/models";
 import { Loader } from "../components/Loader";
+import ErrorMessage from "../components/ErrorMessage";
 
 interface ITab {
   id: string, 
@@ -19,6 +20,7 @@ export default function AdminPage() {
   const tabs: ITabs = {
     'users': { id: 'users', title: 'Пользователи' },
     'products': { id: 'products', title: 'Товары' },
+    'categories': { id: 'categories', title: 'Категории товаров' },
     'orders': { id: 'orders', title: 'Заказы' }
   }
 
@@ -55,10 +57,6 @@ export default function AdminPage() {
     addNewItem: () => { }
   };
 
-  useEffect(() => {
-    error && alert(error);
-    clearError();
-  }, [error, clearError]);
 
   useEffect(() => {
     async function getUsers() {
@@ -249,9 +247,28 @@ export default function AdminPage() {
         return [ p.id, new Date(p.created).toLocaleDateString(), p.customerEmail, p.state, p.itemsCount, p.totalCost]
       }),
       sourceObjs: [ ...orders ],
-      canAddNew: true,
+      canAddNew: false,
       updateItem: () => {},
       addNewItem: () => {}
+    } 
+  }
+
+  if (activeTab.id === 'categories') {
+    const stateSelectItems = orderStates.map(c => ({ id: c.id, title: c.title }));
+    tableProps = {
+      columnsIds: [ 'id', 'title' ],
+      columnsTitle: [ 'ID', 'Наименование' ],
+      inputTypes: [ null, InputTypes.text ],
+      selectItems: [ null, null ],
+      values: categories.map((p) => {
+        return [ p.id, p.title ]
+      }),
+      sourceObjs: [ ...categories ],
+      canAddNew: true,
+      updateItem: () => {},
+      addNewItem: (form) => {
+        setCategories([ { id: form.get('id'), title: form.get('title')}, ...categories])
+      }
     } 
   }
   
@@ -261,6 +278,7 @@ export default function AdminPage() {
       <ul className="nav nav-tabs">
         {tabsElement}
       </ul>
+      { error != null && <ErrorMessage message={error} close={clearError}/> }
       {loading && <Loader />}
         <EditableTable {...tableProps}/>
     </div>

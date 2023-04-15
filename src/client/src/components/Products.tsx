@@ -8,7 +8,7 @@ export interface IProductsProps {
 
 export default function Products(props: IProductsProps) {
     return (
-        <div>
+        <div className="container">
             <section>
                 <div className="text-center">
                     <div className="row">

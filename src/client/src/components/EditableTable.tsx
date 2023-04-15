@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export enum InputTypes {
   text,
@@ -36,6 +36,11 @@ export function EditableTable(props: IEditableTableProps) {
     const value = event.currentTarget.value;
     setForm((previousForm) => previousForm.set(key, value));
   }
+
+  useEffect(() => {
+    setEditableRow(null)
+    setForm(new Map())
+  }, [props])
 
   const fileChangedHandler = (event: React.FormEvent<HTMLInputElement>) => {
     if (event.currentTarget == null){
@@ -99,14 +104,14 @@ export function EditableTable(props: IEditableTableProps) {
 
     if (inputType === InputTypes.image){
       return (
-        <td className="w-25" key={`${rowIndex}-${valueIndex}`}>
-          <img className="img-fluid img-thumbnail" src={`data:image/png;base64,${props.values[rowIndex][valueIndex]?.toString() ?? ''}`}/>
+        <td style={{width: '10rem'}} key={`${rowIndex}-${valueIndex}`}>
+          <img className="img img-thumbnail" style={{width: '10rem'}} src={`data:image/png;base64,${props.values[rowIndex][valueIndex]?.toString() ?? ''}`}/>
         </td>
       )
     }
 
     return (
-      <td key={`${rowIndex}-${valueIndex}`}>{props.values[rowIndex][valueIndex]}</td>
+      <td style={{width: '10rem'}} key={`${rowIndex}-${valueIndex}`}>{props.values[rowIndex][valueIndex]}</td>
     )
   }
 
@@ -136,7 +141,7 @@ export function EditableTable(props: IEditableTableProps) {
   }
 
   return (
-    <div className="container-fluid my-2">
+    <div className="container my-2">
       { props.canAddNew && (
         <div className="my-2">
             <button className="btn btn-outline-primary btn-sm" onClick={onAddNewHandler}>Добавить</button>
@@ -165,7 +170,7 @@ export function EditableTable(props: IEditableTableProps) {
                                           {props.inputTypes.map((t, i) => {
                                             return getInputElement(editableRow, i, null);
                                           })}
-                                          <td>
+                                          <td style={{width: '10rem'}} >
                                             <button className="btn btn-link btn-sm" onClick={onSaveNewHandler}>Сохранить</button>
                                             <button className="btn btn-link btn-sm" onClick={onCancelHandler}>Отменить</button>
                                           </td>
@@ -178,7 +183,7 @@ export function EditableTable(props: IEditableTableProps) {
                                         {v.map((d, j) => {
                                           return getValueElement(i, j)
                                         })}
-                                        <td>
+                                        <td style={{width: '10rem'}} >
                                           {editableRow === i && <button className="btn btn-link btn-sm" onClick={() => onSaveHandler(i)}>Сохранить</button>}
                                           {editableRow !== i && <button className="btn btn-link btn-sm" disabled={editableRow != null} onClick={() => onEditHanler(i)}>Изменить</button>}
                                           {editableRow === i && <button className="btn btn-link btn-sm" onClick={onCancelHandler}>Отменить</button>}
