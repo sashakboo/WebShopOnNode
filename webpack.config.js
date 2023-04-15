@@ -23,8 +23,7 @@ const config = {
     new webpack.IgnorePlugin({ resourceRegExp: /^pg-native$/ }),
     new CopyPlugin({
       patterns: [
-        { from: "./config", to: "./config" },
-        { from: "./config/default.json", to: "./config/production.json" }
+        { from: "./config", to: "./config" }
       ],
     }),
   ],
