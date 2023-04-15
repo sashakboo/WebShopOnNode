@@ -21,11 +21,17 @@ alter sequence orderstate_seq_id owner to root;
 
 create table productscategory
 (
-    id    bigint default nextval('public.product_cat_id_seq'::REGCLASS) not null
+    id     bigint  default nextval('public.product_cat_id_seq'::REGCLASS) not null
         constraint productscategory_pk
             primary key,
-    title varchar(256)                                                  not null
+    title  varchar(256)                                                   not null,
+    active boolean default true                                           not null
 );
+
+alter table productscategory
+    owner to root;
+
+
 
 alter table productscategory
     owner to root;
@@ -50,15 +56,21 @@ alter table products
 
 create table users
 (
-    id       bigint default nextval('public.user_id_seq'::REGCLASS) not null
+    id       bigint  default nextval('public.user_id_seq'::REGCLASS) not null
         constraint users_pk
             primary key,
-    email    varchar(250)                                           not null
+    email    varchar(250)                                            not null
         constraint users_email_uindex
             unique,
-    password varchar(250)                                           not null,
-    role     text   default 'user'::STRING                          not null
+    password varchar(250)                                            not null,
+    role     text    default 'user'::STRING                          not null,
+    active   boolean default true                                    not null
 );
+
+alter table users
+    owner to root;
+
+
 
 alter table users
     owner to root;

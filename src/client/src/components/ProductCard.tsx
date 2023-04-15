@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { IProduct } from "../types/models";
+import { IProduct } from "../models";
 import { useHttp } from "../hooks/http.hook";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";

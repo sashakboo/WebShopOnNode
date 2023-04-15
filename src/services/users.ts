@@ -3,7 +3,7 @@ import { IUser } from "../models";
 
 
 export async function GetUserByEmail(email: string): Promise<IUser | null> {
-  const commandText = 'SELECT id, email, password, role from public.users where email = $1::varchar';
+  const commandText = 'SELECT id, email, password, role, cast(active as string) as active from public.users where email = $1::varchar';
   const params = [ email ];
   const result = await executeCommand(commandText, params);
   if (result.rowCount === 1) {
@@ -12,14 +12,15 @@ export async function GetUserByEmail(email: string): Promise<IUser | null> {
               id: parseInt(result.rows[0]['id']),
               email: result.rows[0]['email'],
               password: result.rows[0]['password'],
-              role: result.rows[0]['role']
+              role: result.rows[0]['role'],
+              active: result.rows[0]['active'] == 'true'
           });
   }
   return null;
 }
 
 export async function GetUser(id: number): Promise<IUser | null> {
-  const commandText = 'SELECT id, email, password, role from public.users where id = $1::int';
+  const commandText = 'SELECT id, email, password, role, cast(active as string) as active from public.users where id = $1::int';
   const params = [ id ];
   const result = await executeCommand(commandText, params);
   if (result.rowCount === 1) {
@@ -28,7 +29,8 @@ export async function GetUser(id: number): Promise<IUser | null> {
               id: parseInt(result.rows[0]['id']),
               email: result.rows[0]['email'],
               password: result.rows[0]['password'],
-              role: result.rows[0]['role']
+              role: result.rows[0]['role'],
+              active: result.rows[0]['active'] == 'true'
           });
   }
   return null;
@@ -60,20 +62,21 @@ export async function GetUserRole(id: number): Promise<string> {
 }
 
 export async function GetUsers(): Promise<Array<IUser>> {
-  const commandText = 'select id, email, role from public.users order by role, email';
+  const commandText = 'select id, email, role, cast(active as string) active from public.users order by role, email';
   const results = await executeCommand(commandText, []);
   return results.rows.map(r => {
       return {
           id: parseInt(r['id']),
           email: r['email'],
           password: '',
-          role: r['role']
+          role: r['role'],
+          active: r['active'] == 'true'
       } as IUser
   })
 }
 
-export async function UpdateUser(userId: number, password: string, role: string) {
-  const commandText = 'update public.users set password = $1::string, role = $2::string  where id = $3::int';
-  const params = [ password, role, userId ];
+export async function UpdateUser(userId: number, password: string, role: string, active: boolean) {
+  const commandText = 'update public.users set password = $1::string, role = $2::string, active= $3::boolean where id = $4::int';
+  const params = [ password, role, active, userId ];
   await executeCommand(commandText, params);
 }

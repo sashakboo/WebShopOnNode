@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { EditableTable, IEditableTableProps, InputTypes } from "../components/EditableTable";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
-import { ICategory, ICreatedProduct, IOrder, IOrderState, IProduct, IUpdateOrderState, IUpdatedProduct, IUser } from "../types/models";
+import { ICategory, ICreatedProduct, IOrder, IOrderState, IProduct, IUpdateOrderState, IUpdatedProduct, IUser } from "../models";
 import { Loader } from "../components/Loader";
 import ErrorMessage from "../components/ErrorMessage";
 
@@ -108,13 +108,14 @@ export default function AdminPage() {
   }, []);
 
   if (activeTab.id === 'users') {
+    const isActiveSelectItems = [ { id: 1, title: 'Да' }, { id: 0, title: 'Нет' } ];
     tableProps = {
-      columnsIds: [ 'id', 'email', 'role', 'password' ],
-      columnsTitle: [ 'ID', 'Email', 'Роль', 'Пароль'],
-      inputTypes: [ null, null, InputTypes.text, InputTypes.text ],
-      selectItems: [],
+      columnsIds: [ 'id', 'email', 'role', 'password', 'active' ],
+      columnsTitle: [ 'ID', 'Email', 'Роль', 'Пароль', 'Вкл'],
+      inputTypes: [ null, null, InputTypes.text, InputTypes.text, InputTypes.select ],
+      selectItems: [ null, null, null, null, isActiveSelectItems ],
       values: users.map((u) => {
-        return [ u.id, u.email, u.role, '' ]
+        return [ u.id, u.email, u.role, '', u.active ? 'Да' : 'Нет' ]
       }),
       sourceObjs: [ ...users ],
       canAddNew: false,
@@ -123,7 +124,8 @@ export default function AdminPage() {
         const newUser: IUser = { 
           ...user, 
           password: (form.get('password') as string ?? user.password), 
-          role: (form.get('role') as string ?? user.role) 
+          role: (form.get('role') as string ?? user.role),
+          active: form.get('active') != null ? form.get('active') == 1 : user.active
         };
         const result = await updateUser(newUser);
         setUsers(users.map(u => {
@@ -138,7 +140,7 @@ export default function AdminPage() {
   
     const updateUser = async (user: IUser) => {
       const apiUrl = '/api/users/update';
-      const response = await request(apiUrl, 'POST', JSON.stringify({ id: user.id, password: user.password, role: user.role }), { Authorization: `Bearer ${auth.token}` });
+      const response = await request(apiUrl, 'POST', JSON.stringify(user), { Authorization: `Bearer ${auth.token}` });
       return response as IUser;
     }
   }
@@ -279,13 +281,14 @@ export default function AdminPage() {
       }));
     }
 
+    const isActiveSelectItems = [ { id: 1, title: 'Да' }, { id: 0, title: 'Нет' } ];
     tableProps = {
-      columnsIds: [ 'id', 'title' ],
-      columnsTitle: [ 'ID', 'Наименование' ],
-      inputTypes: [ null, InputTypes.text ],
-      selectItems: [ null, null ],
+      columnsIds: [ 'id', 'title', 'active' ],
+      columnsTitle: [ 'ID', 'Наименование', 'Вкл' ],
+      inputTypes: [ null, InputTypes.text, InputTypes.select ],
+      selectItems: [ null, null, isActiveSelectItems ],
       values: categories.map((p) => {
-        return [ p.id, p.title ]
+        return [ p.id, p.title, p.active ? 'Да' : 'Нет' ]
       }),
       sourceObjs: [ ...categories ],
       canAddNew: true,
@@ -293,7 +296,8 @@ export default function AdminPage() {
         const sourceCategory = sourceObj as ICategory;
         const category = {
           ...sourceCategory,
-          title: form.get('title') ?? sourceCategory.title
+          title: form.get('title') ?? sourceCategory.title,
+          active: form.get('active') == 1
         }
         await updateCategory(category);
       },
@@ -301,8 +305,7 @@ export default function AdminPage() {
         await createCategory(form.get('title'));
       }
     } 
-  }
-  
+  }  
 
   return (
     <div className="container-fluid">

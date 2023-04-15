@@ -1,6 +1,7 @@
 export interface ICategory {
     id: number,
-    title: string
+    title: string,
+    active: boolean
 }
 
 export interface IProduct {
@@ -25,12 +26,7 @@ export interface IUser {
     role: string,
     email: string,
     password: string,
-}
-
-export interface IUpdatedUser {
-    id: number,
-    password: string,
-    role: string
+    active: boolean
 }
 
 export interface IUpdatedProduct {

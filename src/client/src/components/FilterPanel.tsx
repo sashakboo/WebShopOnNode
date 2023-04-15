@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { ICategory } from "../types/models";
+import { ICategory } from "../models";
 import { Link } from "react-router-dom";
 import { useHttp } from "../hooks/http.hook";
 import { AuthContext } from "../context/AuthContext";
@@ -12,7 +12,7 @@ export default function FilterPanel() {
 
     useEffect(() => {
         async function getCategories() {
-          const apiUrl = '/api/categories';
+          const apiUrl = '/api/categories/active';
           const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${auth.token}` });
           const loadedCategopries= response as Array<ICategory>;
           setCategories([...loadedCategopries]);

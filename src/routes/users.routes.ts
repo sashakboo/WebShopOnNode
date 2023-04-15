@@ -4,10 +4,10 @@ import { GetUser, GetUsers, UpdateUser } from "../services/users";
 import { Request, Response } from 'express';
 import Auth from "../middleware/auth.middleware";
 import { check, validationResult } from "express-validator";
-import { IUpdatedUser } from "../models";
+import { IUser } from "../models";
 
 interface IUserRequest extends Request {
-  body: IUpdatedUser
+  body: IUser
 }
 
 const usersRouter = Router();
@@ -34,9 +34,9 @@ usersRouter.post('/update',
         });
       }     
       
-      const { id, password, role } = req.body;
+      const { id, password, role, active } = req.body;
       const hashedPassword = await bcrypt.hash(password, 12);
-      await UpdateUser(id, hashedPassword, role);
+      await UpdateUser(id, hashedPassword, role, active);
       const user = await GetUser(id);
       res.json(user);          
     } catch (e) {

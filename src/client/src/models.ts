@@ -1,6 +1,7 @@
 export interface ICategory {
     id: number,
-    title: string
+    title: string,
+    active: boolean
 }
 
 export interface IProduct {
@@ -65,5 +66,6 @@ export interface IUser {
     id: number,
     email: string,
     password: string,
-    role: string
+    role: string,
+    active: boolean
 }

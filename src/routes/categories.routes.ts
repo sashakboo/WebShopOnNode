@@ -10,9 +10,18 @@ interface ICategoryRequest extends Request {
 
 const categoriesRouter = Router();
 
+categoriesRouter.get('/active', Auth, async (req: Request, res: Response) => {
+  try {        
+     const categories = await GetCategories(true);
+     res.json(categories);          
+  } catch (e) {
+    res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
+  }
+ })
+
 categoriesRouter.get('/', Auth, async (req: Request, res: Response) => {
  try {        
-    const categories = await GetCategories();
+    const categories = await GetCategories(false);
     res.json(categories);          
  } catch (e) {
    res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });

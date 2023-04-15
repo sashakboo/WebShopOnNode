@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useHttp } from "../hooks/http.hook"
-import { IBasketProduct, ICreatedOrder, IProduct } from "../types/models";
+import { IBasketProduct, ICreatedOrder, IProduct } from "../models";
 import { AuthContext } from '../context/AuthContext';
 import { NotifyContext } from '../context/NotifyContext';
 import { Link } from 'react-router-dom';

@@ -1,5 +1,5 @@
 import ProductCard from "./ProductCard";
-import { IProduct } from "../types/models";
+import { IProduct } from "../models";
 
 export interface IProductsProps {
     products: Array<IProduct>

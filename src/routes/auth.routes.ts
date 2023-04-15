@@ -88,6 +88,10 @@ authRouter.post(
         return res.status(400).json({ message: 'Пользователь не найден' });
       }
 
+      if (!user.active) {
+        return res.status(400).json({ message: 'Пользователь отключен' });
+      }
+
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {

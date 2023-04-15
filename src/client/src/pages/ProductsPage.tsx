@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import FilterPanel from "../components/FilterPanel";
-import { IProduct } from "../types/models";
+import { IProduct } from "../models";
 import ProductList from "../components/ProductList";
 import { useParams } from "react-router-dom";
 import { useHttp } from "../hooks/http.hook";
