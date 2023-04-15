@@ -11,7 +11,7 @@ filesRouter.post('/createicon', [ Auth, upload.single('icon') ], async (req: Req
     const iconFile = req.file as Express.Multer.File;
     res.json({ filePath: iconFile.path });
   } catch (e) {
-    console.log(e)
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 })

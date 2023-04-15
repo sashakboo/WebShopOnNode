@@ -11,7 +11,7 @@ export async function GetAllOrders(): Promise<Array<IOrder>> {
     'inner join public.orderstates os on os.id = o.state ' +
     'inner join public.orderitems i on i.orderid = o.id ' +
     'group by o.id, o.created, u.email, os.title ' +
-    'order by o.created, o.state, o.id'  
+    'order by o.created desc, o.state, o.id'  
 
   const result = await executeCommand(commandText, []);
   const orders: Array<IOrder> = result.rows.map(r => {
@@ -25,6 +25,28 @@ export async function GetAllOrders(): Promise<Array<IOrder>> {
     }
   });
   return orders;
+}
+
+export async function GetOrder(id: number): Promise<IOrder> {
+  const commandText = 'select o.id, o.created, u.email customeremail, os.title as state, count(i.id) as itemscount, sum(i.orderprice) as totalcost ' +
+    'from public.orders o ' +
+    'inner join public.users u on u.id = o.customer ' +  
+    'inner join public.orderstates os on os.id = o.state ' +
+    'inner join public.orderitems i on i.orderid = o.id ' +
+    'where o.id = $1::int ' +
+    'group by o.id, o.created, u.email, os.title ' +
+    'order by o.created, o.state, o.id'  
+
+  const result = await executeCommand(commandText, [ id ]);
+  const r = result.rows[0];
+  return {
+    id: parseInt(r['id']),
+    created: new Date(r['created']),
+    state: r['state'],
+    customerEmail: r['customeremail'],
+    itemsCount: parseInt(r['itemscount']),
+    totalCost: parseFloat(r['totalcost']),
+  }
 }
 
 export async function GetOrderStates(): Promise<Array<IOrderState>> {

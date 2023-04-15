@@ -17,6 +17,7 @@ usersRouter.get('/', Auth, async(req: Request, res: Response) => {
     const users = await GetUsers();
     res.json(users);          
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 })
@@ -40,6 +41,7 @@ usersRouter.post('/update',
       const user = await GetUser(id);
       res.json(user);          
     } catch (e) {
+      console.error(e);
       res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
     }
   });

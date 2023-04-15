@@ -15,16 +15,15 @@ export default function ProductsPage() {
     const auth = useContext(AuthContext);
     const categoryId = parseInt(useParams().id ?? '');
 
-    const fetchProducts = async () => {
-        try {
-            const apiUrl = Number.isNaN(categoryId) ? '/api/products' : `/api/products/${categoryId}`;
-            const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${auth.token}` });
-            const data = response as Array<IProduct>;
-            setProducts(data);    
-        } catch (e) { }
-      }
-
     useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const apiUrl = Number.isNaN(categoryId) ? '/api/products' : `/api/products/${categoryId}`;
+                const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${auth.token}` });
+                const data = response as Array<IProduct>;
+                setProducts(data);    
+            } catch (e) { }
+        }
         fetchProducts();
     }, [categoryId]);
 

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { useHttp } from "../hooks/http.hook"
-import { IBasketProduct, ICreatedOrder, IProduct } from "../models";
+import { IBasketProduct, ICreatedOrder } from "../models";
 import { AuthContext } from '../context/AuthContext';
 import { NotifyContext } from '../context/NotifyContext';
 import { Link } from 'react-router-dom';
@@ -85,8 +85,6 @@ export default function CheckoutPage() {
         )
     }
 
-    const hasError = (key: string) => formError.findIndex(x => x == key) > -1;
-
     return (
     <div className="container">
         <form>
@@ -166,7 +164,7 @@ export default function CheckoutPage() {
                                     </div>
                                     <div className="col-md-4 float-right">
                                         <span className="text-muted">{p.price} р.</span>
-                                        <button className="btn btn-outline-danger btn-sm" disabled={loading} onClick={() => removeFromBasket(p)}>Удалить</button>
+                                        <button className="btn btn-outline-danger btn-sm mx-2" disabled={loading} onClick={() => removeFromBasket(p)}>Удалить</button>
                                     </div>
                                 </li>)
                             })

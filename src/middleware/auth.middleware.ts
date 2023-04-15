@@ -18,6 +18,7 @@ export default function Auth (req: Request<{ userId: string}>, res: Response, ne
     req.params.userId = decoded.userId as string;
     next();
   } catch (e) {
+    console.error(e);
     res.status(401).json({ message: 'Не авторизован' });          
   }
 }

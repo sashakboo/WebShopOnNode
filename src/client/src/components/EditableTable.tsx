@@ -123,7 +123,7 @@ export function EditableTable(props: IEditableTableProps) {
     if (inputType === InputTypes.image){
       return (
         <td style={{width: '10rem'}} key={`${rowIndex}-${valueIndex}`}>
-          <img className="img img-thumbnail" style={{width: '10rem'}} src={`data:image/png;base64,${props.values[rowIndex][valueIndex]?.toString() ?? ''}`}/>
+          <img className="img img-thumbnail" style={{width: '10rem'}} src={`data:image/png;base64,${props.values[rowIndex][valueIndex]?.toString() ?? ''}`} alt="thumbnail"/>
         </td>
       )
     }

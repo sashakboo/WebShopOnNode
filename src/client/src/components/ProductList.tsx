@@ -1,12 +1,12 @@
 import ProductCard from "./ProductCard";
 import { IProduct } from "../models";
 
-export interface IProductsProps {
+export interface IProductListProps {
     products: Array<IProduct>
     addToBasketCallback: (product: IProduct) => void
 }
 
-export default function ProductList(props: IProductsProps) {
+export default function ProductList(props: IProductListProps) {
     return (
         <div className="container my-3">
             <div className="text-center">

@@ -20,6 +20,7 @@ productsRouter.get('/', Auth, async (req: Request, res: Response) => {
     const filteredProducts = await GetProducts(null, true);
     res.json(filteredProducts);          
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });
@@ -29,6 +30,7 @@ productsRouter.get('/admin', Auth, async (req: Request, res: Response) => {
     const filteredProducts = await GetProducts(null, null);
     res.json(filteredProducts);          
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });
@@ -43,6 +45,7 @@ productsRouter.get('/:catId', Auth, async (req: Request, res:Response) => {
     const filteredProducts = await GetProducts(catId, true);
     res.json(filteredProducts);          
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });
@@ -66,6 +69,7 @@ productsRouter.post('/create', Auth, async (req: ICreatedProductRequest, res: Re
     const updatedProduct = await GetProduct(productId);
     res.json(updatedProduct);  
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });
@@ -76,11 +80,16 @@ productsRouter.post('/update', Auth, async (req: IUpdatedProductRequest, res: Re
     await UpdateProduct(product);
     if (product.iconPath != null) {
       await UpdateProductIcon(product.id, product.iconPath);
-      fs.unlink(product.iconPath, () => {});
+      fs.unlink(product.iconPath, (err) => {
+        if (err) 
+          console.error(`Cannot delete file: ${product.iconPath}`);
+        console.log(`File was deleted: ${product.iconPath}`);
+      });
     }
     const updatedProduct = await GetProduct(product.id);
     res.json(updatedProduct);  
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });

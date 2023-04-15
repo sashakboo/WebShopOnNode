@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CreateOrder, GetAllOrders, GetOrderStates, SetOrderState } from "../services/orders";
+import { CreateOrder, GetAllOrders, GetOrder, GetOrderStates, SetOrderState } from "../services/orders";
 import { Request, Response } from 'express';
 import Auth from "../middleware/auth.middleware";
 import { ICreatedOrder, IUpdateOrderState } from "../models";
@@ -20,6 +20,7 @@ orderRouter.get('/', Auth, async(req: Request, res: Response) => {
     const orders = await GetAllOrders();
     res.json(orders);          
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });
@@ -29,6 +30,7 @@ orderRouter.get('/states', Auth, async (req: Request, res: Response) => {
     const orderStates = await GetOrderStates();
     res.json(orderStates);          
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });
   }
 });
@@ -53,7 +55,8 @@ orderRouter.post('/changestate', Auth, async(req: ISetOrderStateRequest, res: Re
   try {
     const orderState = req.body;
     await SetOrderState(orderState);
-    res.status(200).json('done');       
+    const updatedOrder = await GetOrder(orderState.orderId);
+    res.json(updatedOrder);       
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: 'Что-то пошло не так, попробуйте снова' });

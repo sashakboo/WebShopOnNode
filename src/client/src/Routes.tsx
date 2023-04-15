@@ -1,4 +1,4 @@
-import { Routes , Route, Navigate, redirect } from 'react-router-dom';
+import { Routes , Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import ProductsPage from './pages/ProductsPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -13,8 +13,7 @@ export const useRoutes = (isAuthenticated: boolean) => {
             </Routes>
         )    
     }
-
-    console.log(isAuthenticated)
+    
     return (
         <Routes>
             <Route path="/filter/cat/:id" element={<ProductsPage />}/>

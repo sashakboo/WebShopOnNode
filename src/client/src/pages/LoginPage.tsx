@@ -12,12 +12,6 @@ export default function LoginPage() {
       password: ''
     });
 
-    const [ errorMessage, setErrorMessage ] = useState<string | null>(null);
-
-    useEffect(() => {
-        setErrorMessage(error);
-    }, [error, clearError]);
-
     const changeHandler = (event: React.FormEvent<HTMLInputElement>) => {
         setForm({ ...form, [event.currentTarget.name]: event.currentTarget.value });
     }
