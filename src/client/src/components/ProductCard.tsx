@@ -29,6 +29,7 @@ export default function ProductCard(props: IProductCardProps) {
                 <Link to={`/filter/cat/${props.product.category.id}`} className="card-link ">
                     <p>{props.product.category.title}</p>
                 </Link>
+                <p className="mb-3 price">{props.product.price} р.</p>
                 <button className="btn btn-primary" type="submit" disabled={loading} onClick={() => addToBasket(props.product)}>
                     Купить
                 </button>
