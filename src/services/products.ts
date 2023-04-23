@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { executeCommand } from "../database/database";
-import { IProduct, IBasketProduct, ICreatedProduct, ICategory, IUpdatedProduct } from "../models";
+import { IProduct, IBasketProduct, ICreatedProduct, ICategory, IUpdatedProduct, IListProduct } from "../models";
 
 export async function GetCategories(onlyActive: boolean): Promise<Array<ICategory>> {
   let commandText = 'select id, title, cast(active as string) as active from productscategory';
@@ -91,6 +91,45 @@ export async function GetProducts(categoryId: number | null, isActive: boolean |
           title: r["title"],
           price: parseInt(r["price"]),
           isActive: r['active'] === 'true',
+          icon: r['icon']
+      }
+      return product;
+  });
+  return Promise.resolve(products);
+}
+
+export async function GetListProducts(userId: number, categoryId: number | null, isActive: boolean | null): Promise<Array<IListProduct>> {
+  let commandText = 'SELECT ' +
+    'p.id, p.title, c.id as categoryid, c.title as categorytitle, cast(c.active as string) as categoryactive, ' + 
+    'p.price, cast(p.active as string) as active, convert_from(p.icon, \'UTF8\') as icon, count(b.id) as basketcount ' + 
+    'FROM public.products as p inner join public.productscategory c on p.category = c.id ' +
+    'left join public.basket b on b.product = p.id and b.customer = $1::int ' +
+    'where c.active = true';
+  let params: Array<any> = [ userId ]
+  if (isActive != null){
+    params = [ ...params, isActive ];
+    commandText += ` and p.active = $${params.length}::boolean `;
+  }
+  if (categoryId != null){
+    params = [ ...params, categoryId ];
+    commandText += ` and category = $${params.length}::int `;
+  }
+  commandText += ' group by p.id, p.title, c.id, c.title, c.active, p.price, p.active, p.icon '
+  commandText += ' order by p.active desc, id desc';
+
+  const results = await executeCommand(commandText, params);
+  const products = results.rows.map(r => {
+      const product: IListProduct = {
+          id: parseInt(r["id"]),
+          category : {
+              id: parseInt(r["categoryid"]),
+              title: r["categorytitle"],
+              active: r['categoryactive'] === 'true',
+          },
+          title: r["title"],
+          price: parseInt(r["price"]),
+          isActive: r['active'] === 'true',
+          basketCount: parseInt(r['basketcount']),
           icon: r['icon']
       }
       return product;

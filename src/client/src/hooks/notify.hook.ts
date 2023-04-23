@@ -3,11 +3,13 @@ import { useState } from 'react';
 export const useNotify = () => {
   const [basketCount, setbasketCount] = useState(0);
   const changeBasketCount = (count: number) => {
-    setbasketCount(basketCount + count);
+    setbasketCount((b) => {
+      return b + count;
+    });
   }
 
   const resetBasketCount = () => {
-    setbasketCount(0);
+    setbasketCount((c) => 0);
   }
 
   return { basketCount, changeBasketCount, resetBasketCount };

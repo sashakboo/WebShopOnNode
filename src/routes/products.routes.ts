@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { Router } from "express";
-import { CreateProduct, GetProduct, GetProducts, UpdateProduct, UpdateProductIcon } from "../services/products";
+import { CreateProduct, GetListProducts, GetProduct, GetProducts, UpdateProduct, UpdateProductIcon } from "../services/products";
 import { Request, Response } from 'express';
 import Auth from "../middleware/auth.middleware";
 import { ICreatedProduct, IUpdatedProduct } from "../models";
@@ -17,7 +17,12 @@ const productsRouter = Router();
 
 productsRouter.get('/', Auth, async (req: Request, res: Response) => {
   try {
-    const filteredProducts = await GetProducts(null, true);
+    const userId = parseInt(req.params.userId);
+    if (Number.isNaN(userId))
+    {
+      res.status(400);
+    }   
+    const filteredProducts = await GetListProducts(userId, null, true);
     res.json(filteredProducts);          
   } catch (e) {
     console.error(e);
@@ -42,7 +47,12 @@ productsRouter.get('/:catId', Auth, async (req: Request, res:Response) => {
     {
       res.status(400);
     }
-    const filteredProducts = await GetProducts(catId, true);
+    const userId = parseInt(req.params.userId);
+    if (Number.isNaN(userId))
+    {
+      res.status(400);
+    }   
+    const filteredProducts = await GetListProducts(userId, catId, true);
     res.json(filteredProducts);          
   } catch (e) {
     console.error(e);

@@ -1,9 +1,9 @@
 import ProductCard from "./ProductCard";
-import { IProduct } from "../models";
+import { IListProduct } from "../models";
 
 export interface IProductListProps {
-    products: Array<IProduct>
-    addToBasketCallback: (product: IProduct) => void
+    products: Array<IListProduct>
+    addToBasketCallback: (product: IListProduct) => void
 }
 
 export default function ProductList(props: IProductListProps) {

@@ -1,23 +1,30 @@
 import { Link } from "react-router-dom";
-import { IProduct } from "../models";
+import { IListProduct } from "../models";
 import { useHttp } from "../hooks/http.hook";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 export interface IProductCardProps {
-    product: IProduct,
-    addToBasketCallback: (product: IProduct) => void;
+    product: IListProduct,
+    addToBasketCallback: (product: IListProduct) => void;
 }
 
 export default function ProductCard(props: IProductCardProps) {
     const auth = useContext(AuthContext);
     const { loading, request } = useHttp();
-    const addToBasket = async (product: IProduct) => {
+    const addToBasket = async (product: IListProduct) => {
         try {
             const apiUrl = `/api/basket/add/${product.id}`;
             await request(apiUrl, 'POST', null, { Authorization: `Bearer ${auth.token}` });  
             props.addToBasketCallback(product); 
         } catch (e) { }
+    }
+
+    const getInBasketCount = () => {
+        if (props.product.basketCount > 0)
+          return ` (${props.product.basketCount})`;
+
+        return null;
     }
 
     return (
@@ -29,9 +36,10 @@ export default function ProductCard(props: IProductCardProps) {
                 <Link to={`/filter/cat/${props.product.category.id}`} className="card-link ">
                     <p>{props.product.category.title}</p>
                 </Link>
-                <p className="mb-3 price">{props.product.price} р.</p>
-                <button className="btn btn-primary" type="submit" disabled={loading} onClick={() => addToBasket(props.product)}>
-                    Купить
+                <p className="price">{props.product.price} р.</p>
+                <button className="btn btn-outline-primary" type="submit" disabled={loading} onClick={() => addToBasket(props.product)}>
+                    В корзину
+                    {getInBasketCount()}
                 </button>
             </div>
         </div>

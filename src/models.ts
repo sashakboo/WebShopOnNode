@@ -13,6 +13,10 @@ export interface IProduct {
     isActive: boolean
 }
 
+export interface IListProduct extends IProduct {
+    basketCount: number
+}
+
 export interface IBasketProduct {
     id: number,
     title: string,

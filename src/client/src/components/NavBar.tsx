@@ -41,6 +41,7 @@ export default function NavBar() {
             const response = await request(apiUrl, 'GET', null, { Authorization: `Bearer ${token}` });
             const data = parseInt(response);
             if (!Number.isNaN(data))
+              resetBasketCount();
               changeBasketCount(data); 
           }   
         } catch (e) { }
